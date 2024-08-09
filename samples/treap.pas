@@ -108,14 +108,13 @@ function TSortedArray.NewNode(x: _T): PTreapNode;
 var
     c, root: PTreapNode;
 begin
-    Result := Nodes[SENTINEL].c + 1;
+    Result := Nodes[Nodes[SENTINEL].r].c + 1;
     if Length(Nodes) <= Result then SetLength(Nodes, Result * 2);
     Nodes[Result].x := x;
     Nodes[Result].y := Random(High(SizeInt)); // Generate random priority
     Nodes[Result].c := 1;
     Nodes[Result].l := SENTINEL;
     Nodes[Result].r := SENTINEL;
-    Nodes[SENTINEL].c := Result;
 end;
 
 procedure TSortedArray.RotateRight(var Root, l: PTreapNode);
