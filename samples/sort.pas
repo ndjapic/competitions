@@ -17,8 +17,8 @@ type
         procedure setItem(index: SizeInt; item: _t); inline;
     public
         procedure clear();
-        constructor create(n: sizeint);
-        destructor destroy(); override; // allows the use of a parent class destroyer
+        constructor create(l, r: sizeint);
+        destructor destroy(); override;
         function nonIncreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
         function nonDecreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
         procedure MergeSort(lend, rend: sizeint; cmp: _c; stable: boolean);
@@ -70,7 +70,7 @@ destructor tlist.destroy();
 begin
     setlength(fitems, 0);
     setlength(items2, 0);
-    inherited; // Also called parent class destroyer
+    inherited;
 end;
 
 function tlist.nonIncreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
@@ -94,7 +94,7 @@ var
 begin
     i := nonDecreasingTo(lend, rend, cmp);
     if i >= rend then
-    else if not stable and nonIncreasingTo(lend, rend, cmp) >= rend then begin
+    else if not stable and (nonIncreasingTo(lend, rend, cmp) >= rend) then begin
 
         l := lend;
         r := rend - 1;
@@ -151,7 +151,7 @@ end;
 
 begin
     readln(n);
-    cmp := icomparer.create(); // Initialize the object by calling the class builder
+    cmp := icomparer.create();
     a := ilist.create(0, 0);
     p := ilist.create(0, 0);
 
@@ -165,7 +165,7 @@ begin
 
     writeln(p.items[n-2] + 1);
 
-    a.free(); // Free invites your own class Destroy discharger
+    a.free();
     p.free();
     cmp.free();
 end.
