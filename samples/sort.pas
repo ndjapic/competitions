@@ -77,14 +77,14 @@ function tlist.nonIncreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
 begin
     result := lend + 1;
     while (result < rend) and
-        cmp.LessOrEqual(fitems[result], fitems[result - 1]) do inc(result);
+        cmp.LessOrEqual(items[result], items[result - 1]) do inc(result);
 end;
 
 function tlist.nonDecreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
 begin
     result := lend + 1;
     while (result < rend) and
-        cmp.LessOrEqual(fitems[result - 1], fitems[result]) do inc(result);
+        cmp.LessOrEqual(items[result - 1], items[result]) do inc(result);
 end;
 
 procedure tlist.MergeSort(lend, rend: sizeint; cmp: _c; stable: boolean);
@@ -99,9 +99,9 @@ begin
         l := lend;
         r := rend - 1;
         while l < r do begin
-            items2[l] := fitems[l];
-            fitems[l] := fitems[r];
-            fitems[r] := items2[l];
+            items2[l] := items[l];
+            items[l] := items[r];
+            items[r] := items2[l];
             inc(l);
             dec(r);
         end;
@@ -116,14 +116,14 @@ begin
         r := m;
         for i := lend to rend - 1 do
             if (r = rend) or (l < m) and cmp.LessOrEqual(items[l], items[r]) then begin
-                items2[i] := fitems[l];
+                items2[i] := items[l];
                 inc(l);
             end else begin
-                items2[i] := fitems[r];
+                items2[i] := items[r];
                 inc(r);
             end;
 
-        for i := lend to rend - 1 do fitems[i] := items2[i];
+        for i := lend to rend - 1 do items[i] := items2[i];
     end;
 end;
 
@@ -141,7 +141,7 @@ begin
     r := count;
     while r-l > 1 do begin
         m := (l+r) div 2;
-        if cmp.LessOrEqual(fitems[m], x) then
+        if cmp.LessOrEqual(items[m], x) then
             l := m
         else
             r := m;
