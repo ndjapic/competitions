@@ -4,6 +4,42 @@ uses
     math;
 const
     th_size = 1000 * 1000;
+type
+    TComparer<_T> = class
+    public
+        function Compare(constref lhs, rhs: _T): SizeInt; inline;
+    end;
+    PTreapNode = SizeInt;
+    TTreapNode<_T> = class
+        x: _T;
+        y, c: SizeInt;
+        l, r: PTreapNode;
+    end;
+    TSortedArray<_T> = class
+    private
+        const
+            SENTINEL = 0;
+        Nodes: array of TNode;
+        function GetItem(Index: SizeInt): PTreapNode;
+        function GetRoot();
+        procedure SetRoot(Root: PTreapNode);
+    public
+        constructor Create();
+        destructor Destroy(); override;
+        procedure Clear();
+        function NewNode(x: _T): PTreapNode;
+        procedure RotateRight(var Root, l: PTreapNode); inline;
+        procedure RotateLeft(var Root, r: PTreapNode); inline;
+        procedure FixHeap(var Root: PTreapNode);
+        procedure Insert(var Root: PTreapNode; x: _T);
+        function GetItem(Root: PTreapNode; Index: SizeInt): PTreapNode;
+        procedure Meld(var Root: PTreapNode);
+        procedure DeleteAt(var Root: PTreapNode; Index: SizeInt);
+        function BisectRight(x: _T): PTreapNode;
+        property Item[Index: SizeInt]: PTreapNode read GetItem;
+        property RootNode: PTreapNode read GetRoot write SetRoot;
+    end;
+
 var
     n, i: int32;
     randtime, a: array [1 .. th_size] of int32;
@@ -13,6 +49,184 @@ var
         end;
         n, root: int32;
     end;
+
+function TComparer.Compare(constref lhs, rhs: _T): SizeInt; inline;
+begin
+    Result := lhs - rhs;
+end;
+
+function TSortedArray.GetItem(Root: PTreapNode; Index: SizeInt): PTreapNode;
+var
+    l: PTreapNode;
+begin
+    if Root = SENTINEL then
+        Result := SENTINEL
+    else begin
+        l := Nodes[Root].l;
+        if Index = Nodes[l].c then
+            Result := Root;
+        else if Index < Nodes[l].c then
+            Result := GetItem(l, Index)
+        else
+            Result := GetItem(Nodes[Root].r, Index - 1 - Nodes[l].c);
+    end;
+end;
+
+function TSortedArray.GetRoot(): PTteapNode;
+begin
+    Result := Nodes[SENTINEL].r;
+end;
+
+procedure TSortedArray.SetRoot(Root: PTreapNode);
+begin
+    Nodes[SENTINEL].r := Root;
+end;
+
+constructor TSortedArray.Create();
+begin
+    Randomize;
+    SetLength(Nodes, max(0, SENTINEL) + 1);
+    Nodes[SENTINEL].x := Low(_T);
+    Nodes[SENTINEL].y := High(SizeInt);
+    Nodes[SENTINEL].c := 0;
+    Nodes[SENTINEL].r := SENTINEL;
+end;
+
+destructor TSortedArray.Destroy();
+begin
+    SetLength(Nodes, 0);
+    inherited;
+end;
+
+destructor TSortedArray.Clear();
+begin
+    Nodes[SENTINEL].c := 0;
+    Nodes[SENTINEL].r := SENTINEL;
+end;
+
+function TSortedArray.NewNode(x: _T): PTreapNode;
+var
+    c, root: PTreapNode;
+begin
+    Result := Nodes[Nodes[SENTINEL].r].c + 1;
+    if Length(Nodes) <= Result then SetLength(Nodes, Result * 2);
+    Nodes[Result].x := x;
+    Nodes[Result].y := Random(High(SizeInt)); // Generate random priority
+    Nodes[Result].c := 1;
+    Nodes[Result].l := SENTINEL;
+    Nodes[Result].r := SENTINEL;
+end;
+
+procedure TSortedArray.RotateRight(var Root, l: PTreapNode);
+{var
+    l: PTreapNode;}
+begin
+    {l := Nodes[Root].l;}
+    Nodes[Root].l := Nodes[l].r;
+    Nodes[l].r := Root;
+    Nodes[l].c := Nodes[Root].c;
+    dec(Nodes[Root].c, Nodes[Nodes[l].l].c);
+    Root := l;
+end;
+
+procedure TSortedArray.RotateLeft(var Root, r: PTreapNode);
+{var
+    r: PTreapNode;}
+begin
+    {r := Nodes[Root].r;}
+    Nodes[Root].r := Nodes[r].l;
+    Nodes[r].l := Root;
+    Nodes[r].c := Nodes[Root].c;
+    dec(Nodes[Root].c, Nodes[Nodes[r].r].c);
+    Root := r;
+end;
+
+procedure TSortedArray.FixHeap(var Root: PTreapNode);
+var
+    l, r: PTreapNode;
+    y: SizeInt;
+begin
+    l := Nodes[Root].l;
+    r := Nodes[Root].r;
+    y := Nodes[Root].y;
+    if (l <> SENTINEL) and (Nodes[l].y > y) then RotateRight(Root, l);
+    if (r <> SENTINEL) and (Nodes[r].y > y) then RotateLeft(Root, r);
+    FixHeap(l);
+    FixHeap(r);
+end;
+
+procedure TSortedArray.Insert(var Root: PTreapNode; x: _T);
+var
+    l, r: PTreapNode;
+    y: SizeInt;
+begin
+    if Root = SENTINEL then
+        Root := NewNode(x)
+    else begin
+        Inc(Nodes[Root].c);
+        y := Nodes[Root].y;
+        if x < Nodes[Root].x then begin
+            l := Nodes[Root].l;
+            Insert(l, x);
+            if Nodes[l].y > y then RotateRight(Root, l);
+        end else begin
+            r := Nodes[Root].r;
+            Insert(r, x);
+            if Nodes[r].y > y then RotateLeft(Root, r);
+        end;
+    end;
+    {FixHeap(Root);}
+end;
+
+procedure TSortedArray.Meld(var Root: PTreapNode);
+var
+    l, r: PTreapNode;
+begin
+    if Root = SENTINEL then
+    else begin
+        l := Nodes[Root].l;
+        r := Nodes[Root].r;
+        if (r = SENTINEL) or (l <> SENTINEL) and (Nodes[l].y > Nodes[r].y) then begin
+            Meld(l);
+            Nodes[l].r := r;
+            Root := l;
+        end else begin
+            Meld(r);
+            Nodes[v].l := l;
+            Root := r;
+        end;
+    end;
+end;
+
+procedure TSortedArray.DeleteAt(var Root: PTreapNode; Index: SizeInt);
+var
+    l, r: PTreapNode;
+begin
+    if Root <> SENTINEL then begin
+        l := Nodes[Root].l;
+        r := Nodes[Root].r;
+        if Index = Nodes[l].c then
+            Meld(Root);
+        else if Index < Nodes[l].c then
+            DeleteAt(l, Index)
+        else
+            DeleteAt(r, Index - 1 - Nodes[l].c);
+        Nodes[Root].c := Nodes[l].c + 1 + Nodes[r].c;
+    end;
+end;
+
+function TSortedArray.BisectRight(Root: PTreapNode; x: _T): SizeInt;
+var
+    l, r: PTreapNode;
+    y: SizeInt;
+begin
+    if Root = SENTINEL then
+        Result := 0
+    else if x < Nodes[Root].x then
+        Result := BisectRight(Nodes[Root].l, x)
+    else
+        Result := Nodes[l].c + 1 + BisectRight(Nodes[Root].r, x);
+end;
 
 procedure th_init();
 var

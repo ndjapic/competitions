@@ -172,5 +172,98 @@ type
     property Count: Integer read FCount;
   end;
 
+procedure Split(Root: PNode; K: Integer; var Left, Right: PNode);
+begin
+  if Root = nil then
+  begin
+    Left := nil;
+    Right := nil;
+    Exit;
+  end;
+  if Root^.LeftSize < K then
+  begin
+    Split(Root^.Right, K - Root^.LeftSize - 1, Root^.Right, Right);
+    Left := Root;
+  end else
+  begin
+    Split(Root^.Left, K, Left, Root^.Left);
+    Right := Root;
+  end;
+  Root^.LeftSize := Left^.Size;
+  Root^.RightSize := Right^.Size;
+  Root^.Size := Root^.LeftSize + Root^.RightSize + 1;
+end;
+
+procedure Merge(Left, Right: PNode; var Root: PNode);
+begin
+  if Left = nil then
+  begin
+    Root := Right;
+    Exit;
+  end;
+  if Right = nil then
+  begin
+    Root := Left;
+    Exit;
+  end;
+  if Left^.Priority > Right^.Priority then
+  begin
+    Root := Left;
+    Merge(Left^.Right, Right, Root^.Right);
+    Root^.Size := Root^.LeftSize + Root^.RightSize + 1;
+  end else
+  begin
+    Root := Right;
+    Merge(Left, Right^.Left, Root^.Left);
+    Root^.Size := Root^.LeftSize + Root^.RightSize + 1;
+  end;
+end;
+
+procedure Split(Root: PNode; K: Integer; var Left, Right: PNode);
+begin
+  // ... (previous code)
+  // After splitting, check if the heap property is violated at Root
+  if Root^.Left <> nil and Root^.Left^.Priority > Root^.Priority then
+    RotateRight(Root);
+  if Root^.Right <> nil and Root^.Right^.Priority > Root^.Priority then
+    RotateLeft(Root);
+end;
+
+procedure Merge(Left, Right: PNode; var Root: PNode);
+begin
+  // ... (previous code)
+  // After merging, check if the heap property is violated at Root
+  if Root^.Left <> nil and Root^.Left^.Priority > Root^.Priority then
+    RotateRight(Root);
+  if Root^.Right <> nil and Root^.Right^.Priority > Root^.Priority then
+    RotateLeft(Root);
+end;
+
+procedure RotateRight(var Root: PNode);
+var
+  Left: PNode;
+begin
+  Left := Root^.Left;
+  Root^.Left := Left^.Right;
+  Left^.Right := Root;
+  // Update sizes
+  Root^.Size := Root^.LeftSize + Root^.RightSize + 1;
+  Left^.Size := Left^.LeftSize + Root^.Size + 1;
+  Root := Left;
+end;
+
+procedure RotateLeft(var Root: PNode);
+var
+  Right: PNode;
+begin
+  Right := Root^.Right;
+  Root^.Right := Right^.Left;
+  Right^.Left := Root;
+  // Update sizes
+  Root^.Size := Root^.LeftSize + Root^.RightSize + 1;
+  Right^.Size := Root^.Size + Right^.RightSize + 1;
+  Root := Right;
+end;
+
 begin
 end.

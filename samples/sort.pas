@@ -1,66 +1,90 @@
 program sort;
 {$mode objfpc}{$h+}{$j-}{$inline on}
-const
-    maxn = 200 * 1000;
+uses
+    math;
+
 type
-    tarr32 = array of int32;
     generic tcomparer<_t> = class
     public
         function LessOrEqual(constref lhs, rhs: _t): boolean; inline;
     end;
     generic tlist<_t, _c> = class
-    public
-        items, items2: array of _t;
+    private
+        i0: sizeint;
+        fitems, items2: array of _t;
         count: sizeint;
-        constructor create();
-        destructor destroy(); override; // allows the use of a parent class destroyer
-        procedure add(item: _t);
-        function isNonIncreasing(lend, rend: sizeint; cmp: _c): boolean; inline;
+        function getItem(index: SizeInt): _t; inline;
+        procedure setItem(index: SizeInt; item: _t); inline;
+    public
+        procedure clear();
+        constructor create(l, r: sizeint);
+        destructor destroy(); override;
+        function nonIncreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
+        function nonDecreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
         procedure MergeSort(lend, rend: sizeint; cmp: _c; stable: boolean);
         procedure sort(cmp: _c; stable: boolean);
         function bisectr(x: _t; cmp: _c): sizeint;
+        property items[index: sizeint]: _t read getItem write setItem; default;
     end;
+
+type
     icomparer = specialize tcomparer<int32>;
     ilist = specialize tlist<int32, icomparer>;
 
 var
     n, i, x: int32;
     cmp: icomparer;
-    a: ilist;
+    a, p: ilist;
 
 function tcomparer.LessOrEqual(constref lhs, rhs: _t): boolean; inline;
 begin
-    result := lhs <= rhs;
+    result := a[lhs] <= a[rhs];
 end;
 
-constructor tlist.create();
+function tlist.getItem(index: SizeInt): _t; inline;
 begin
-    setlength(items, 1);
+    result := fitems[index - i0];
+end;
+
+procedure tlist.setItem(index: SizeInt; item: _t); inline;
+begin
+    dec(index, i0);
+    if length(fitems) <= index then setlength(fitems, 2 * index);
+    fitems[index] := item;
+    count := max(count, index + 1);
+end;
+
+procedure tlist.clear();
+begin
     count := 0;
+end;
+
+constructor tlist.create(l, r: sizeint);
+begin
+    setlength(fitems, max(1, r-l));
+    clear();
+    i0 := l;
 end;
 
 destructor tlist.destroy();
 begin
-    setlength(items, 0);
+    setlength(fitems, 0);
     setlength(items2, 0);
-    count := 0;
-    inherited; // Also called parent class destroyer
+    inherited;
 end;
 
-procedure tlist.add(item: _t);
+function tlist.nonIncreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
 begin
-    if length(items) <= count then setlength(items, 2 * count);
-    items[count] := item;
-    inc(count);
+    result := lend + 1;
+    while (result < rend) and
+        cmp.LessOrEqual(items[result], items[result - 1]) do inc(result);
 end;
 
-function tlist.isNonIncreasing(lend, rend: sizeint; cmp: _c): boolean; inline;
-var
-    j: sizeInt;
+function tlist.nonDecreasingTo(lend, rend: sizeint; cmp: _c): sizeint; inline;
 begin
-    j := lend + 1;
-    while (j < rend) and cmp.LessOrEqual(items[j], items[j-1]) do inc(j);
-    result := j >= rend;
+    result := lend + 1;
+    while (result < rend) and
+        cmp.LessOrEqual(items[result - 1], items[result]) do inc(result);
 end;
 
 procedure tlist.MergeSort(lend, rend: sizeint; cmp: _c; stable: boolean);
@@ -68,48 +92,44 @@ var
     i, l, r, m: sizeint;
 
 begin
-    i := lend + 1;
-    while (i < rend) and cmp.LessOrEqual(items[i-1], items[i]) do inc(i);
+    i := nonDecreasingTo(lend, rend, cmp);
+    if i >= rend then
+    else if not stable and (nonIncreasingTo(lend, rend, cmp) >= rend) then begin
 
-    if i < rend then begin
+        l := lend;
+        r := rend - 1;
+        while l < r do begin
+            items2[l] := items[l];
+            items[l] := items[r];
+            items[r] := items2[l];
+            inc(l);
+            dec(r);
+        end;
 
-        if not stable and isNonIncreasing(lend, rend, cmp) then begin
+    end else begin
 
-            l := lend;
-            r := rend - 1;
-            while l < r do begin
-                items2[l] := items[l];
-                items[l] := items[r];
-                items[r] := items2[l];
+        m := (lend + rend) div 2;
+        if i < m then MergeSort(lend, m, cmp, stable);
+        MergeSort(m, rend, cmp, stable);
+
+        l := lend;
+        r := m;
+        for i := lend to rend - 1 do
+            if (r = rend) or (l < m) and cmp.LessOrEqual(items[l], items[r]) then begin
+                items2[i] := items[l];
                 inc(l);
-                dec(r);
+            end else begin
+                items2[i] := items[r];
+                inc(r);
             end;
 
-        end else begin
-
-            m := (lend + rend) div 2;
-            if i < m then MergeSort(lend, m, cmp, stable);
-            MergeSort(m, rend, cmp, stable);
-
-            l := lend;
-            r := m;
-            for i := lend to rend - 1 do
-                if (r = rend) or (l < m) and cmp.LessOrEqual(items[l], items[r]) then begin
-                    items2[i] := items[l];
-                    inc(l);
-                end else begin
-                    items2[i] := items[r];
-                    inc(r);
-                end;
-
-            for i := lend to rend - 1 do items[i] := items2[i];
-        end;
+        for i := lend to rend - 1 do items[i] := items2[i];
     end;
 end;
 
 procedure tlist.sort(cmp: _c; stable: boolean);
 begin
-    if length(items2) < length(items) then setlength(items2, length(items));
+    if length(items2) < length(fitems) then setlength(items2, length(fitems));
     MergeSort(0, count, cmp, stable);
 end;
 
@@ -129,183 +149,23 @@ begin
     bisectr := r;
 end;
 
-{procedure msort(lend, rend: int32);
-var
-    i, l, r, m: int32;
-
-    function LessOrEqual(l, r: int32): boolean;
-    begin
-        result := (a[l] <= a[r]) and ((a[l] < a[r]) or (l <= r));
-        result := a[l] <= a[r];
-    end;
-
-begin
-    i := lend + 1;
-    while (i < rend) and LessOrEqual(i-1, i) do inc(i);
-
-    if i < rend then begin
-
-        m := (lend + rend) div 2;
-        if i < m then msort(lend, m);
-        msort(m, rend);
-
-        l := lend;
-        r := m;
-        for i := lend to rend - 1 do
-            if (r = rend) or (l < m) and LessOrEqual(l, r) then begin
-                merge[i] := a[l];
-                inc(l);
-            end else begin
-                merge[i] := a[r];
-                inc(r);
-            end;
-
-        for i := lend to rend - 1 do a[i] := merge[i];
-
-    end;
-end;
-
-function msortinv(lend, rend: int32; inversions: int64): int64;
-var
-    i, l, r, m: int32;
-
-    function LessOrEqual(l, r: int32): boolean;
-    begin
-        result := (a[l] <= a[r]) and ((a[l] < a[r]) or (l <= r));
-        result := a[l] <= a[r];
-    end;
-
-begin
-    i := lend + 1;
-    while (i < rend) and LessOrEqual(i-1, i) do inc(i);
-
-    if i < rend then begin
-
-        m := (lend + rend) div 2;
-        if i < m then inversions := msortinv(lend, m, inversions);
-        inversions := msortinv(m, rend, inversions);
-
-        l := lend;
-        r := m;
-        for i := lend to rend - 1 do
-            if (r = rend) or (l < m) and LessOrEqual(l, r) then begin
-                merge[i] := a[l];
-                inc(l);
-            end else begin
-                merge[i] := a[r];
-                inc(inversions, m-l);
-                inc(r);
-            end;
-
-        for i := lend to rend - 1 do a[i] := merge[i];
-
-    end;
-    msortinv := inversions;
-end;
-
-procedure msorti(var indices, priority: tarr32; lend, rend: int32);
-var
-    i, l, r, m: int32;
-
-    function LessOrEqual(l, r: int32): boolean;
-    begin
-        result := (priority[l] <= priority[r]) and ((priority[l] < priority[r]) or (l <= r));
-        result := priority[l] <= priority[r];
-    end;
-
-begin
-    i := lend + 1;
-    while (i < rend) and LessOrEqual(indices[i-1], indices[i]) do inc(i);
-
-    if i < rend then begin
-
-        m := (lend + rend) div 2;
-        if i < m then msorti(indices, priority, lend, m);
-        msorti(indices, priority, m, rend);
-
-        l := lend;
-        r := m;
-        for i := lend to rend - 1 do
-            if (r = rend) or (l < m) and LessOrEqual(indices[l], indices[r]) then begin
-                merge[i] := indices[l];
-                inc(l);
-            end else begin
-                merge[i] := indices[r];
-                inc(r);
-            end;
-
-        for i := lend to rend - 1 do indices[i] := merge[i];
-
-    end;
-end;
-
-function bisectr(x: int64): int32;
-var
-    l, r, m: int32;
-begin
-    l := 0;
-    r := n+1;
-    while r-l > 1 do begin
-        m := (l+r) div 2;
-        if x < a[m] then
-            r := m
-        else
-            l := m;
-    end;
-    bisectr := r;
-end;
-
-function numelm(x: int64): int32;
-begin
-    numelm := bisectr(x) - bisectr(x-1);
-end;
-
 begin
     readln(n);
-    setlength(a, n);
-    setlength(merge, n);
-    setlength(p, n);
-
-    for i := 0 to n-1 do begin
-        read(a[i]);
-        p[i] := i;
-    end;
-    readln;
-
-    msorti(p, a, 0, n);
-
-    for i := 0 to n-2 do write(a[p[i]], ' '); writeln(a[p[n-1]]);
-end.}
-
-begin
-    readln(n);
-    cmp := icomparer.create(); // Initialize the object by calling the class builder
-    a := ilist.create();
+    cmp := icomparer.create();
+    a := ilist.create(0, 0);
+    p := ilist.create(0, 0);
 
     for i := 0 to n-1 do begin
         read(x);
-        a.add(x);
+        a[i] := x;
+        p[i] := i;
     end;
     readln;
+    p.sort(cmp, false);
 
-    a.sort(cmp, false);
-    {Shorter version (cant free): a.sort(icomparer.create(), false);}
+    writeln(p[n-2] + 1);
 
-    for i := 0 to n-2 do write(a.items[i], ' ');
-    writeln(a.items[n-1]);
-
-    write(' | ', a.bisectr(-1, cmp), ': ', -1);
-    write(' | ', a.bisectr(0, cmp), ': ', 0);
-    write(' | ', a.bisectr(64, cmp), ': ', 64);
-    write(' | ', a.bisectr(81, cmp), ': ', 81);
-    write(' | ', a.bisectr(99, cmp), ': ', 99);
-    writeln;
-
-    a.free(); // Free invites your own class Destroy discharger
+    a.free();
+    p.free();
     cmp.free();
 end.
-
-(*
-12
-16 32 64 27 81 16 64 25 36 49 64 81
-*)
