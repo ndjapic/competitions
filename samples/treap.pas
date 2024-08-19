@@ -2,7 +2,7 @@ program SortedTreap;
 
 type
     TSortedTreap<_T> = class
-        Left, Right: PNode;
+        Left, Right: TSortedTreap;
         Key: _T;
         Priority: Integer;
         Size: Integer;
@@ -11,9 +11,9 @@ type
         constructor Create(K: _T);
         destructor Destroy; override;
         procedure Update;
-        procedure Split(K: _T; var L, R: TNode); (* Needs implementation *)
+        procedure Split(K: _T; var L, R: TSortedTreap); (* Needs implementation *)
         function Rank(K: _T): Integer;
-        procedure SplitByRank(i: Integer; var L, R: TNode); (* Needs implementation *)
+        procedure SplitByRank(i: Integer; var L, R: TSortedTreap); (* Needs implementation *)
         procedure Merge(L, R: TSortedTreap); (* Needs implementation *)
         procedure Insort(K: _T); (* Needs implementation *)
         procedure Delete(K: _T);
@@ -72,16 +72,15 @@ begin
 
     if R <> nil then begin
         R.SplitByRank(1, M, R);
-        if M <> nil then begin
-            if M.Key = K then M.Free;
+        if M.Key = K then begin
+            M.FreeAndNil
+        else if R = nil then
+            R := M
+        else
             R.Merge(M, R);
-        end;
     end;
 
-    if L = nil then
-        Self := R
-    else
-        Merge(L, R);
+    Merge(L, R);
 end;
 
 var
