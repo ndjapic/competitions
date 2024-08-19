@@ -6,7 +6,7 @@ type
         Key: _T;
         Priority: Integer;
         Size: Integer;
-        class function Compare(lhs, rhs: _T): Integer; static;
+        class function Compare(lhs, rhs: _T): Integer; static; abstract;
         class function GetSize(Other: TSortedTreap): Integer; static;
         constructor Create(K: _T);
         destructor Destroy; override;
@@ -20,6 +20,12 @@ type
         // Other methods as needed
         property At[i: Integer]: _T Read GetAt; default;
     end;
+    TIntTreap = TSortedTreap<Integer>;
+
+class function TIntTreap.Compare(lhs, rhs: Integer): Integer;
+begin
+    Result := lhs - rhs;
+end;
 
 constructor TSortedTreap.Create(K: _T);
 begin
@@ -51,17 +57,36 @@ begin
     Size := GetSize(Left) + 1 + GetSize(Right);
 end;
 
+procedure TSortedTreap.Split(K: _T; var L, R: TSortedTreap);
+begin
+    if Compare(K, Key) < 0 then begin
+        if Left = nil then
+            L := nil
+        else
+            Left.Split(K, L, Left);
+        R := Self;
+    end else begin
+        if Right = nil then
+            R := nil
+        else
+            Right.Split(K, Right, R);
+        L := Self;
+    end;
+    Update;
+end;
+
 function TSortedTreap.Rank(K: _T): Integer;
 var
     L, R: TSortedTreap;
 begin
     Split(K, L, R);
-    Result := GetSize(L);
 
     if L = nil then
-        Self := R
-    else
-        L.Merge(L, R);
+        Result := 0;
+    else begin
+        Result := L.Size;
+        Merge(L, R);
+    end;
 end;
 
 procedure TSortedTreap.Delete(K: _T);
@@ -73,7 +98,7 @@ begin
     if R <> nil then begin
         R.SplitByRank(1, M, R);
         if M.Key = K then begin
-            M.FreeAndNil
+            M.Free
         else if R = nil then
             R := M
         else
@@ -85,16 +110,16 @@ end;
 
 var
     n, i, K: Integer;
-    a: TSortedTreap<Integer>;
+    a: TIntTreap;
 
 begin
     a := nil;
     ReadLn(n);
 
-    for i := 1 to n do begin
+    for i := 0 to n-1 do begin
         Read(K);
         if a = nil then
-            a := TSortedTreap<Integer>.Create(K)
+            a := TIntTreap.Create(K)
         else
             a.Insort(K);
     end;
@@ -104,8 +129,9 @@ begin
     a.Delete(10); // Does nothing.
     n := a.Size; // Update n.
 
-    for i := 1 to n-1 do Write(a[i]);
-    WriteLn(a[n]);
+    for i := 0 to n-2 do Write(a[i], ' ');
+    WriteLn(a[n-1]);
+    a.Free;
 end.
 
 (*
