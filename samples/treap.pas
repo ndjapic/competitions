@@ -1,10 +1,9 @@
 program SortedTreap;
-{$mode delphi}{$inline on}
 
 type
     TSortedTreap<_T> = class
         Left, Right: PNode;
-        Key: _T; // Replaced with generic type
+        Key: _T;
         Priority: Integer;
         Size: Integer;
         class function Compare(lhs, rhs: _T): Integer; static;
@@ -12,17 +11,17 @@ type
         constructor Create(K: _T);
         destructor Destroy; override;
         procedure Update;
-        procedure Split(K: _T; var L, R: TNode);
+        procedure Split(K: _T; var L, R: TNode); (* Needs implementation *)
         function Rank(K: _T): Integer;
-        procedure SplitByRank(i: Integer; var L, R: TNode);
-        procedure Merge(L, R: TSortedTreap);
-        procedure Insort(K: _T);
+        procedure SplitByRank(i: Integer; var L, R: TNode); (* Needs implementation *)
+        procedure Merge(L, R: TSortedTreap); (* Needs implementation *)
+        procedure Insort(K: _T); (* Needs implementation *)
         procedure Delete(K: _T);
         // Other methods as needed
         property At[i: Integer]: _T Read GetAt; default;
     end;
 
-constructor TSortedTreap.Create(K: Integer);
+constructor TSortedTreap.Create(K: _T);
 begin
     Inherited Create;
     Key := K;
@@ -36,13 +35,13 @@ destructor TSortedTreap.Destroy;
 begin
     if Left <> nil then Left.Free;
     if Right <> nil then Right.Free;
-    Inherited Destroy;
+    Self.Free; (* Free current node *)
 end;
 
 class function TSortedTreap.GetSize(Other: TSortedTreap): Integer;
 begin
     if Other = nil then
-        Result = 0
+        Result := 0
     else
         Result := Other.Size;
 end;
@@ -52,14 +51,12 @@ begin
     Size := GetSize(Left) + 1 + GetSize(Right);
 end;
 
-// ... Implement split, merge, rank, insert, delete methods ...
-
 function TSortedTreap.Rank(K: _T): Integer;
 var
     L, R: TSortedTreap;
 begin
     Split(K, L, R);
-    Result = GetSize(L);
+    Result := GetSize(L);
 
     if L = nil then
         Self := R
