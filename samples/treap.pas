@@ -84,11 +84,11 @@ begin
     else if R = nil then
         Self := L
     else if L.Priority < R.Priority then begin
-        Left.Merge(L, R.Left);
         Self := R;
+        Left.Merge(L, Left);
     end else begin
-        Right.Merge(L.Right, R);
         Self := L;
+        Right.Merge(Right, R);
     end;
     if Self <> nil then Update;
 end;
