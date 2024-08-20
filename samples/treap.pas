@@ -56,7 +56,7 @@ destructor TSortedTreap<_T>.Destroy;
 begin
     if Left <> nil then Left.Free;
     if Right <> nil then Right.Free;
-    Self.Free;
+    Self.FreeAndNil;
 end;
 
 procedure TSortedTreap<_T>.Split(K: _T; var L, R: TSortedTreap<_T>);
