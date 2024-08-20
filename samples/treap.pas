@@ -1,4 +1,6 @@
 program SortedTreap;
+uses
+    SysUtil;
 
 type
     TSortedTreap<_T> = class
@@ -200,13 +202,13 @@ begin
     end;
     ReadLn;
 
-    a.Delete(9); // Delete one of two nines.
+    {a.Delete(9); // Delete one of two nines.
     a.Delete(10); // Does nothing.
-    n := a.Size; // Update n.
+    n := a.Size; // Update n.}
 
     for i := 0 to n-2 do Write(a[i], ' ');
     WriteLn(a[n-1]);
-    a.Free;
+    {a.Free;}
 end.
 
 (*
