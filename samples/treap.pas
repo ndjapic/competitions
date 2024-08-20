@@ -61,15 +61,7 @@ end;
 
 procedure TSortedTreap<_T>.Split(K: _T; var L, R: TSortedTreap<_T>);
 begin
-    if Compare(K, Key) < 0 then begin
-        if Left = nil then
-            L := nil
-        else begin
-            Left.Split(K, L, Left);
-            Left.Update;
-        end;
-        R := Self;
-    end else begin
+    if Compare(Key, K) < 0 then begin
         if Right = nil then
             R := nil
         else begin
@@ -77,6 +69,14 @@ begin
             Right.Update;
         end;
         L := Self;
+    end else begin
+        if Left = nil then
+            L := nil
+        else begin
+            Left.Split(K, L, Left);
+            Left.Update;
+        end;
+        R := Self;
     end;
     Update;
 end;
