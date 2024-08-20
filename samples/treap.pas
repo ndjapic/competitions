@@ -210,5 +210,8 @@ Exit Code	139
 Exec Time	544 ms
 Memory	1050860 KB
 
-"When a container exits with status code 139, it's because it received a SIGSEGV signal. The operating system terminated the container's process to guard against a memory integrity violation. It's important to investigate what's causing the segmentation errors if your containers are terminating with code 139."
+"When a container exits with status code 139, it's because it received a SIGSEGV signal.
+The operating system terminated the container's process to guard against a memory integrity violation.
+It's important to investigate what's causing the segmentation errors
+if your containers are terminating with code 139."
 *)
