@@ -1,6 +1,5 @@
 program SortedTreap;
-uses
-    SysUtil;
+{$mode delphi}{inline on}
 
 type
     TSortedTreap<_T> = class
@@ -55,10 +54,14 @@ begin
 end;
 
 destructor TSortedTreap<_T>.Destroy;
+var
+    tmp: TSortedTreap<_T>;
 begin
     if Left <> nil then Left.Free;
     if Right <> nil then Right.Free;
-    FreeAndNil(Self);
+    tmp := Self;
+    tmp.Free;
+    Self := nil;
 end;
 
 procedure TSortedTreap<_T>.Split(K: _T; var L, R: TSortedTreap<_T>);
@@ -66,18 +69,14 @@ begin
     if Compare(Key, K) < 0 then begin
         if Right = nil then
             R := nil
-        else begin
+        else
             Right.Split(K, Right, R);
-            Right.Update;
-        end;
         L := Self;
     end else begin
         if Left = nil then
             L := nil
-        else begin
+        else
             Left.Split(K, L, Left);
-            Left.Update;
-        end;
         R := Self;
     end;
     Update;
@@ -121,18 +120,14 @@ begin
     if j < 0 then begin
         if Left = nil then
             L := nil
-        else begin
+        else
             Left.SplitByRank(i, L, Left);
-            Left.Update;
-        end;
         R := Self;
     end else begin
         if Right = nil then
             R := nil
-        else begin
+        else
             Right.SplitByRank(j, Right, R);
-            Right.Update;
-        end;
         L := Self;
     end;
     Update;
