@@ -7,7 +7,7 @@ type
         Key: _T;
         Priority: Integer;
         Size: Integer;
-        class function Compare(lhs, rhs: _T): Integer; virtual;
+        class function Compare(lhs, rhs: _T): Integer; inline; static;
         class function GetSize(Other: TSortedTreap<_T>): Integer; static;
         procedure Update;
         constructor Create(K: _T);
@@ -148,15 +148,17 @@ end;
 
 procedure TSortedTreap<_T>.Delete(K: _T);
 var
-    L, M, R: TSortedTreap<_T>;
+    L, M, R, tmp: TSortedTreap<_T>;
 begin
     Split(K, L, R);
 
     if R <> nil then begin
         R.SplitByRank(1, M, R);
-        if M.Key = K then
-            M.Free
-        else if R = nil then
+        if M.Key = K then begin
+            tmp := M;
+            tmp.Free;
+            M := nil;
+        end else if R = nil then
             R := M
         else
             R.Merge(M, R);
