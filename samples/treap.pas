@@ -64,14 +64,18 @@ begin
     if Compare(K, Key) < 0 then begin
         if Left = nil then
             L := nil
-        else
+        else begin
             Left.Split(K, L, Left);
+            Left.Update;
+        end;
         R := Self;
     end else begin
         if Right = nil then
             R := nil
-        else
+        else begin
             Right.Split(K, Right, R);
+            Right.Update;
+        end;
         L := Self;
     end;
     Update;
@@ -115,14 +119,18 @@ begin
     if j < 0 then begin
         if Left = nil then
             L := nil
-        else
+        else begin
             Left.SplitByRank(i, L, Left);
+            Left.Update;
+        end;
         R := Self;
     end else begin
         if Right = nil then
             R := nil
-        else
+        else begin
             Right.SplitByRank(j, Right, R);
+            Right.Update;
+        end;
         L := Self;
     end;
     Update;
