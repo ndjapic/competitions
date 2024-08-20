@@ -150,7 +150,7 @@ begin
     if R <> nil then begin
         R.SplitByRank(1, M, R);
         if M.Key = K then
-            M.Free
+            M.FreeAndNil
         else if R = nil then
             R := M
         else
