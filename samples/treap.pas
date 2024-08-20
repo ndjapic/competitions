@@ -56,7 +56,7 @@ destructor TSortedTreap<_T>.Destroy;
 begin
     if Left <> nil then Left.Free;
     if Right <> nil then Right.Free;
-    Self.FreeAndNil;
+    Free;
 end;
 
 procedure TSortedTreap<_T>.Split(K: _T; var L, R: TSortedTreap<_T>);
@@ -149,9 +149,10 @@ begin
 
     if R <> nil then begin
         R.SplitByRank(1, M, R);
-        if M.Key = K then
-            M.FreeAndNil
-        else if R = nil then
+        if M.Key = K then begin
+            M.Free;
+            M := nil;
+        end else if R = nil then
             R := M
         else
             R.Merge(M, R);
