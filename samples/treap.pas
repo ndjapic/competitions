@@ -102,13 +102,7 @@ var
     L, R: TSortedTreap<_T>;
 begin
     Split(K, L, R);
-
-    if L = nil then
-        Result := 0
-    else begin
-        Result := L.Size;
-        {Self := TSortedTreap<_T>.Merge(L, R);}
-    end;
+    Result := GetSize(L);
 end;
 
 procedure TSortedTreap<_T>.SplitByRank(i: Integer; var L, R: TSortedTreap<_T>);
