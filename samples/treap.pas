@@ -15,10 +15,10 @@ type
         constructor Create(K: _T);
         destructor Destroy; override;
         procedure Split(K: _T; var L, R: TSortedTreap<_T>);
-        function Merge(L, R: TSortedTreap<_T>): TSortedTreap<_T>;
+        constructor Merge(L, R: TSortedTreap<_T>);
         function Rank(K: _T): Integer;
         procedure SplitByRank(i: Integer; var L, R: TSortedTreap<_T>); (* Needs implementation *)
-        function Insort(K: _T): TSortedTreap<_T>;
+        constructor Insort(K: _T);
         procedure Delete(K: _T);
         procedure dfs;
         function GetAt(i: Integer): _T;
@@ -60,7 +60,7 @@ destructor TSortedTreap<_T>.Destroy;
 begin
     if Left <> nil then Left.Free;
     if Right <> nil then Right.Free;
-    FreeAndNil(Self);
+    // FreeAndNil(Self);
     Inherited;
 end;
 
@@ -82,21 +82,21 @@ begin
     Update;
 end;
 
-function TSortedTreap<_T>.Merge(L, R: TSortedTreap<_T>): TSortedTreap<_T>;
+constructor TSortedTreap<_T>.Merge(L, R: TSortedTreap<_T>);
 begin
     if L = nil then
-        Result := R
+        Self := R
     else if R = nil then
-        Result := L
+        Self := L
     else begin
         if L.Priority < R.Priority then begin
-            Result := R;
-            Result.Left := L.Merge(L, Result.Left);
+            Self := R;
+            Left := L.Merge(L, Left);
         end else begin
-            Result := L;
-            Result.Right := R.Merge(Result.Right, R);
+            Self := L;
+            Right := R.Merge(Right, R);
         end;
-        Result.Update;
+        Update;
     end;
 end;
 
@@ -110,7 +110,7 @@ begin
         Result := 0
     else begin
         Result := L.Size;
-        Self := Merge(L, R);
+        Self := TSortedTreap<_T>.Merge(L, R);
     end;
 end;
 
@@ -135,19 +135,18 @@ begin
     Update;
 end;
 
-function TSortedTreap<_T>.Insort(K: _T): TSortedTreap<_T>;
+constructor TSortedTreap<_T>.Insort(K: _T);
 var
     L, R: TSortedTreap<_T>;
 begin
-    Write('Before Insort ', K, ': '); dfs; WriteLn;
+    Write('Entering Insort ', K, ': '); dfs; WriteLn;
     Split(K, L, R);
     Write('After Split: '); dfs; WriteLn;
     Self := TSortedTreap<_T>.Create(K);
-    Self := Merge(L, Self);
+    Self := TSortedTreap<_T>.Merge(L, Self);
     Write('Between Merge: '); dfs; WriteLn;
-    Self := Merge(Self, R);
-    Write('After Insort ', K, ': '); dfs; WriteLn;
-    Result := Self;
+    Self := TSortedTreap<_T>.Merge(Self, R);
+    Write('Exiting Insort ', K, ': '); dfs; WriteLn;
 end;
 
 procedure TSortedTreap<_T>.Delete(K: _T);
@@ -163,10 +162,10 @@ begin
         else if R = nil then
             R := M
         else
-            R := R.Merge(M, R);
+            R := TSortedTreap<_T>.Merge(M, R);
     end;
 
-    Self := Merge(L, R);
+    Self := TSortedTreap<_T>.Merge(L, R);
 end;
 
 function TSortedTreap<_T>.GetAt(i: Integer): _T;
@@ -222,102 +221,102 @@ begin
 end.
 
 (*
-Standard Input
+Input
 23
 2 3 4 5 6 7 8 9 4 9 16 25 36 49 64 81 8 27 64 16 81 32 64
 
 Exit Code	0
 Exec Time	0 ms
-Memory	1508 KB
+Memory	1628 KB
 
 Standard Output
-Before Insort 3: [2]
+Entering Insort 3: [2]
 After Split: [2]
 Between Merge: [2[3]]
-After Insort 3: [2[3]]
-Before Insort 4: [2[3]]
+Exiting Insort 3: [2[3]]
+Entering Insort 4: [2[3]]
 After Split: [2[3]]
 Between Merge: [2[3[4]]]
-After Insort 4: [2[3[4]]]
-Before Insort 5: [2[3[4]]]
+Exiting Insort 4: [2[3[4]]]
+Entering Insort 5: [2[3[4]]]
 After Split: [2[3[4]]]
-Between Merge: [2[[3[4]]5]]
-After Insort 5: [2[[3[4]]5]]
-Before Insort 6: [2[[3[4]]5]]
-After Split: [2[[3[4]]5]]
-Between Merge: [2[[[3[4]]5]6]]
-After Insort 6: [2[[[3[4]]5]6]]
-Before Insort 7: [2[[[3[4]]5]6]]
-After Split: [2[[[3[4]]5]6]]
-Between Merge: [2[[[[3[4]]5]6]7]]
-After Insort 7: [2[[[[3[4]]5]6]7]]
-Before Insort 8: [2[[[[3[4]]5]6]7]]
-After Split: [2[[[[3[4]]5]6]7]]
-Between Merge: [[2[[[[3[4]]5]6]7]]8]
-After Insort 8: [[2[[[[3[4]]5]6]7]]8]
-Before Insort 9: [[2[[[[3[4]]5]6]7]]8]
-After Split: [[2[[[[3[4]]5]6]7]]8]
-Between Merge: [[2[[[[3[4]]5]6]7]]8[9]]
-After Insort 9: [[2[[[[3[4]]5]6]7]]8[9]]
-Before Insort 4: [[2[[[[3[4]]5]6]7]]8[9]]
-After Split: [[[[[4]5]6]7]8[9]]
+Between Merge: [[2[3[4]]]5]
+Exiting Insort 5: [[2[3[4]]]5]
+Entering Insort 6: [[2[3[4]]]5]
+After Split: [[2[3[4]]]5]
+Between Merge: [[2[3[4]]]5[6]]
+Exiting Insort 6: [[2[3[4]]]5[6]]
+Entering Insort 7: [[2[3[4]]]5[6]]
+After Split: [[2[3[4]]]5[6]]
+Between Merge: [[2[3[4]]]5[[6]7]]
+Exiting Insort 7: [[2[3[4]]]5[[6]7]]
+Entering Insort 8: [[2[3[4]]]5[[6]7]]
+After Split: [[2[3[4]]]5[[6]7]]
+Between Merge: [[2[3[4]]]5[[[6]7]8]]
+Exiting Insort 8: [[2[3[4]]]5[[[6]7]8]]
+Entering Insort 9: [[2[3[4]]]5[[[6]7]8]]
+After Split: [[2[3[4]]]5[[[6]7]8]]
+Between Merge: [[2[3[4]]]5[[[[6]7]8]9]]
+Exiting Insort 9: [[2[3[4]]]5[[[[6]7]8]9]]
+Entering Insort 4: [[2[3[4]]]5[[[[6]7]8]9]]
+After Split: [[4]5[[[[6]7]8]9]]
 Between Merge: [2[[3]4]]
-After Insort 4: [[2[[[[[3]4[4]]5]6]7]]8[9]]
-Before Insort 9: [[2[[[[[3]4[4]]5]6]7]]8[9]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[9]]
-After Insort 9: [[2[[[[[3]4[4]]5]6]7]]8[9[9]]]
-Before Insort 16: [[2[[[[[3]4[4]]5]6]7]]8[9[9]]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8[9[9]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16]]]
-After Insort 16: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16]]]
-Before Insort 25: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16]]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25]]]]
-After Insort 25: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25]]]]
-Before Insort 36: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25]]]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25]]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[36]]]]]
-After Insort 36: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[36]]]]]
-Before Insort 49: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[36]]]]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[36]]]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[[36]49]]]]]
-After Insort 49: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[[36]49]]]]]
-Before Insort 64: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[[36]49]]]]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8[9[[9]16[25[[36]49]]]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64]]
-After Insort 64: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64]]
-Before Insort 81: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64]]
-After Split: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64[81]]]
-After Insort 81: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64[81]]]
-Before Insort 8: [[2[[[[[3]4[4]]5]6]7]]8[[9[[9]16[25[[36]49]]]]64[81]]]
-After Split: [8[[9[[9]16[25[[36]49]]]]64[81]]]
-Between Merge: [2[[[[[3]4[4]]5]6]7[8]]]
-After Insort 8: [[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25[[36]49]]]]64[81]]]
-Before Insort 27: [[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25[[36]49]]]]64[81]]]
-After Split: [[2[[[[[3]4[4]]5]6]7[8]]]8[9[[9]16[25]]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25]]]27]]
-After Insort 27: [[2[[[[[3]4[4]]5]6]7[8]]]8[[[9[[9]16[25]]]27[[36]49]]64[81]]]
-Before Insort 64: [[2[[[[[3]4[4]]5]6]7[8]]]8[[[9[[9]16[25]]]27[[36]49]]64[81]]]
-After Split: [[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25]]]27[[36]49]]]
-Between Merge: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25]]]27[[36]49]]]64]
-After Insort 64: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25]]]27[[36]49]]]64[64[81]]]
-Before Insort 16: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9]16[25]]]27[[36]49]]]64[64[81]]]
-After Split: [[[16[25]]27[[36]49]]64[64[81]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7[8]]]8[9[9[16]]]]
-After Insort 16: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[[36]49]]]64[64[81]]]
-Before Insort 81: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[[36]49]]]64[64[81]]]
-After Split: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[[36]49]]]64[64]]
-Between Merge: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[[36]49]]]64[64[81]]]
-After Insort 81: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[[36]49]]]64[64[81[81]]]]
-Before Insort 32: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[[36]49]]]64[64[81[81]]]]
-After Split: [[[36]49]64[64[81[81]]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[32]]]
-After Insort 32: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[32[[36]49]]]]64[64[81[81]]]]
-Before Insort 64: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[32[[36]49]]]]64[64[81[81]]]]
-After Split: [64[64[81[81]]]]
-Between Merge: [[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[32[[[36]49]64]]]]
-After Insort 64: [[[2[[[[[3]4[4]]5]6]7[8]]]8[[9[[9[16]]16[25]]]27[32[[[36]49]64]]]]64[64[81[81]]]]
+Exiting Insort 4: [[2[[3]4[4]]]5[[[[6]7]8]9]]
+Entering Insort 9: [[2[[3]4[4]]]5[[[[6]7]8]9]]
+After Split: [[2[[3]4[4]]]5[[[6]7]8]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9]
+Exiting Insort 9: [[[2[[3]4[4]]]5[[[6]7]8]]9[9]]
+Entering Insort 16: [[[2[[3]4[4]]]5[[[6]7]8]]9[9]]
+After Split: [[[2[[3]4[4]]]5[[[6]7]8]]9[9]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16]]
+Exiting Insort 16: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16]]
+Entering Insort 25: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16]]
+After Split: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25]]]
+Exiting Insort 25: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25]]]
+Entering Insort 36: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25]]]
+After Split: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25]]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25[36]]]]
+Exiting Insort 36: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25[36]]]]
+Entering Insort 49: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25[36]]]]
+After Split: [[[2[[3]4[4]]]5[[[6]7]8]]9[[9]16[25[36]]]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49]]
+Exiting Insort 49: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49]]
+Entering Insort 64: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49]]
+After Split: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49[64]]]
+Exiting Insort 64: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49[64]]]
+Entering Insort 81: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49[64]]]
+After Split: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[9]16[25[36]]]49[64]]]
+Between Merge: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[[9]16[25[36]]]49[64]]81]]
+Exiting Insort 81: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[[9]16[25[36]]]49[64]]81]]
+Entering Insort 8: [[[2[[3]4[4]]]5[[[6]7]8]]9[[[[9]16[25[36]]]49[64]]81]]
+After Split: [[8]9[[[[9]16[25[36]]]49[64]]81]]
+Between Merge: [[[2[[3]4[4]]]5[[6]7]]8]
+Exiting Insort 8: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9]16[25[36]]]49[64]]81]]
+Entering Insort 27: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9]16[25[36]]]49[64]]81]]
+After Split: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[9]16[25]]]
+Between Merge: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[9]16[[25]27]]]
+Exiting Insort 27: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9]16[[25]27[36]]]49[64]]81]]
+Entering Insort 64: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9]16[[25]27[36]]]49[64]]81]]
+After Split: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[9]16[[25]27[36]]]49]]
+Between Merge: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[9]16[[25]27[36]]]49[64]]]
+Exiting Insort 64: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9]16[[25]27[36]]]49[64[64]]]81]]
+Entering Insort 16: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9]16[[25]27[36]]]49[64[64]]]81]]
+After Split: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[9]]
+Between Merge: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[9[16]]]
+Exiting Insort 16: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[36]]]49[64[64]]]81]]
+Entering Insort 81: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[36]]]49[64[64]]]81]]
+After Split: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[9[16]]16[[25]27[36]]]49[64[64]]]]
+Between Merge: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[9[16]]16[[25]27[36]]]49[[64[64]]81]]]
+Exiting Insort 81: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[36]]]49[[64[64]]81]]81]]
+Entering Insort 32: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[36]]]49[[64[64]]81]]81]]
+After Split: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[9[16]]16[[25]27]]]
+Between Merge: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[9[16]]16[[25]27[32]]]]
+Exiting Insort 32: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[32[36]]]]49[[64[64]]81]]81]]
+Entering Insort 64: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[32[36]]]]49[[64[64]]81]]81]]
+After Split: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[9[16]]16[[25]27[32[36]]]]49]]
+Between Merge: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[9[16]]16[[25]27[32[36]]]]49[64]]]
+Exiting Insort 64: [[[[2[[3]4[4]]]5[[6]7]]8[8]]9[[[[9[16]]16[[25]27[32[36]]]]49[[64[64[64]]]81]]81]]
 2 3 4 4 5 6 7 8 8 9 9 16 16 25 27 32 36 49 64 64 64 81 81
 *)
