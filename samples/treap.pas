@@ -107,7 +107,7 @@ begin
         Result := 0
     else begin
         Result := L.Size;
-        Self := TSortedTreap<_T>.Merge(L, R);
+        {Self := TSortedTreap<_T>.Merge(L, R);}
     end;
 end;
 
@@ -151,7 +151,7 @@ begin
 
     if R <> nil then begin
         R.SplitByRank(1, M, R);
-        if M.Key = K then begin
+        if Compare(M.Key, K) = 0 then begin
             M.Free;
             M := nil;
         end else if R = nil then
