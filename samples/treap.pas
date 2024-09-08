@@ -7,26 +7,26 @@ type
         Key: _T;
         Priority: Integer;
         Size: Integer;
-        class function Compare(lhs, rhs: _T): Integer; inline; static;
+        class function Compare(lhs, rhs: _T): Int32; inline; static;
         class function GetSize(Other: TSortedTreap<_T>): Integer; inline; static;
         procedure Update; inline;
         constructor Create(K: _T);
         destructor Destroy; override;
         procedure Split(K: _T; var L, R: TSortedTreap<_T>);
-        constructor Merge(L, R: TSortedTreap<_T>);
+        class function Merge(var L, R: TSortedTreap<_T>): TSortedTreap<_T>; static;
         function Rank(K: _T): Integer;
         procedure SplitByRank(i: Integer; var L, R: TSortedTreap<_T>);
-        constructor Insort(K: _T);
-        constructor Discard(K: _T);
+        function Insort(K: _T): TSortedTreap<_T>;
+        function Discard(K: _T): TSortedTreap<_T>;
         procedure dfs;
         function GetAt(i: Integer): _T;
         property At[i: Integer]: _T Read GetAt; default;
     end;
-    TIntTreap = TSortedTreap<Integer>;
+    TIntTreap = TSortedTreap<Int32>;
 
 (* BEGIN TSortedTreap *)
 
-class function TSortedTreap<_T>.Compare(lhs, rhs: _T): Integer;
+class function TSortedTreap<_T>.Compare(lhs, rhs: _T): Int32;
 begin
     Result := lhs - rhs;
 end;
@@ -59,6 +59,7 @@ begin
     if Left <> nil then Left.Free;
     if Right <> nil then Right.Free;
     Inherited;
+    Self := nil;
 end;
 
 procedure TSortedTreap<_T>.Split(K: _T; var L, R: TSortedTreap<_T>);
@@ -79,21 +80,18 @@ begin
     Update;
 end;
 
-constructor TSortedTreap<_T>.Merge(L, R: TSortedTreap<_T>);
+class function TSortedTreap<_T>.Merge(var L, R: TSortedTreap<_T>): TSortedTreap<_T>;
 begin
-    if L = nil then
-        Self := R
-    else if R = nil then
-        Self := L
-    else begin
-        if L.Priority < R.Priority then begin
-            Self := R;
-            Left := L.Merge(L, Left);
-        end else begin
-            Self := L;
-            Right := R.Merge(Right, R);
+    if (L = nil) or (R <> nil) and (L.Priority < R.Priority) then begin
+        if R <> nil then begin
+            R.Left := Merge(L, R.Left);
+            R.Update;
         end;
-        Update;
+        Result := R;
+    end else begin
+        L.Right := Merge(L.Right, R);
+        L.Update;
+        Result := L;
     end;
 end;
 
@@ -103,6 +101,7 @@ var
 begin
     Split(K, L, R);
     Result := GetSize(L);
+    Self := Merge(L, R);
 end;
 
 procedure TSortedTreap<_T>.SplitByRank(i: Integer; var L, R: TSortedTreap<_T>);
@@ -126,18 +125,17 @@ begin
     Update;
 end;
 
-constructor TSortedTreap<_T>.Insort(K: _T);
+function TSortedTreap<_T>.Insort(K: _T): TSortedTreap<_T>;
 var
     L, R: TSortedTreap<_T>;
 begin
     Split(K, L, R);
-    Self := TSortedTreap<_T>.Create(K);
-    Self := TSortedTreap<_T>.Merge(L, Self);
-    Self := TSortedTreap<_T>.Merge(Self, R);
-    Write('After Insort ', K, ': '); dfs; WriteLn;
+    Result := TSortedTreap<_T>.Create(K);
+    Result := Merge(L, Result);
+    Result := Merge(Result, R);
 end;
 
-constructor TSortedTreap<_T>.Discard(K: _T);
+function TSortedTreap<_T>.Discard(K: _T): TSortedTreap<_T>;
 var
     L, M, R: TSortedTreap<_T>;
 begin
@@ -151,11 +149,10 @@ begin
         end else if R = nil then
             R := M
         else
-            R := TSortedTreap<_T>.Merge(M, R);
+            R := Merge(M, R);
     end;
 
-    Self := TSortedTreap<_T>.Merge(L, R);
-    Write('After Discard ', K, ': '); dfs; WriteLn;
+    Result := Merge(L, R);
 end;
 
 function TSortedTreap<_T>.GetAt(i: Integer): _T;
