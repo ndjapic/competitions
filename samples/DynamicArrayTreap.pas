@@ -14,29 +14,33 @@ type
         Priority: TPriority;
         Left, Right: TNode;
         Size: Integer; // Size of subtree rooted at this node
+        KeyAcc: Int64; // Keys accumulation of subtree rooted at this node
     end;
 
     TArrayTreap = class
     private
         FRoot: TNode;
+        procedure UpdateNode(N: TNode);
         procedure Split(N: TNode; Index: Integer; var L, R: TNode); // Split tree N into two trees: L (< Index) and R (>= Index)
         procedure Merge(var T: TNode; L, R: TNode); // Merge trees L and R into tree T
-        function GetNode(Key: Integer): TNode;
+        function NewNode(Key: Integer): TNode;
         procedure FreeNode(N: TNode);
         function FindByIndex(N: TNode; Index: Integer): TNode; // Find node with given index
         function GetIndex(N: TNode): Integer; // Get index of node N in the tree
+        function GetCount(N: TNode): Integer;
+        function GetCount: Integer; overload;
+        function GetAcc(N: TNode): Integer;
+        function GetAcc: Integer; overload;
     public
         constructor Create;
         destructor Destroy; override;
         procedure Insert(Index: Integer; Value: Integer);
         procedure Delete(Index: Integer);
         function Get(Index: Integer): Integer;
-        procedure Put(Index: Integer; Value: Integer);
-    private
-        function GetCount(N: TNode): Integer;
-        function GetCount: Integer; overload;
-    public
+        function GetPrefix(Index: Integer): Int64;
+        procedure Update(Index: Integer; Value: Integer);
         property Count: Integer read GetCount;
+        property Acc: Integer read GetAcc;
     end;
 
 {implementation}
@@ -51,7 +55,7 @@ begin
     FreeNode(FRoot);
 end;
 
-function TArrayTreap.GetNode(Key: Integer): TNode;
+function TArrayTreap.NewNode(Key: Integer): TNode;
 begin
     New(Result);
     Result^.Key := Key;
@@ -71,73 +75,95 @@ begin
     end;
 end;
 
-procedure TArrayTreap.Split(N: TNode; Index: Integer; var L, R: TNode);
+function TArrayTreap.GetCount(N: TNode): Integer;
 begin
     if N = nil then
-    begin
+        Result := 0
+    else
+        Result := N^.Size;
+end;
+
+function TArrayTreap.GetCount: Integer; overload;
+begin
+    Result := GetCount(FRoot);
+end;
+
+function TArrayTreap.GetAcc(N: TNode): Integer;
+begin
+    if N = nil then
+        Result := 0
+    else
+        Result := N^.KeyAcc;
+end;
+
+function TArrayTreap.GetAcc: Integer; overload;
+begin
+    Result := GetAcc(FRoot);
+end;
+
+procedure TArrayTreap.UpdateNode(N: TNode);
+begin
+    N^.Size := GetCount(N^.Left) + GetCount(N^.Right) + 1; 
+    N^.KeyAcc := GetAcc(N^.Left) + GetAcc(N^.Right) + N^.Key; 
+end;
+
+procedure TArrayTreap.Split(N: TNode; Index: Integer; var L, R: TNode);
+var
+    RIndex: Integer;
+begin
+    if N = nil then begin
         L := nil;
         R := nil;
-        Exit;
-    end;
+    end else begin
+        RIndex := Index - GetCount(N^.Left) - 1;
 
-    if GetCount(N^.Left) < Index then
-    begin
-        Split(N^.Right, Index - GetCount(N^.Left) - 1, L, R);
-        N^.Right := L;
-        L := N;
-    end
-    else
-    begin
-        Split(N^.Left, Index, L, R);
-        N^.Left := R;
-        R := N;
-    end;
+        if RIndex >= 0 then begin
+            Split(N^.Right, RIndex, L, R);
+            N^.Right := L;
+            L := N;
+        end else begin
+            Split(N^.Left, Index, L, R);
+            N^.Left := R;
+            R := N;
+        end;
 
-    N^.Size := GetCount(N^.Left) + GetCount(N^.Right) + 1; 
+        UpdateNode(N);
+    end;
 end;
 
 procedure TArrayTreap.Merge(var T: TNode; L, R: TNode);
 begin
     if L = nil then
-    begin
-        T := R;
-        Exit;
-    end;
+        T := R
+    else if R = nil then
+        T := L
+    else begin
 
-    if R = nil then
-    begin
-        T := L;
-        Exit;
-    end;
+        if L^.Priority > R^.Priority then begin
+            Merge(L^.Right, L^.Right, R);
+            T := L;
+        end else begin
+            Merge(R^.Left, L, R^.Left);
+            T := R;
+        end;
 
-    if L^.Priority > R^.Priority then
-    begin
-        Merge(L^.Right, L^.Right, R);
-        T := L;
-    end
-    else
-    begin
-        Merge(R^.Left, L, R^.Left);
-        T := R;
+        UpdateNode(T);
     end;
-
-    T^.Size := GetCount(T^.Left) + GetCount(T^.Right) + 1; 
 end;
 
 function TArrayTreap.GetIndex(N: TNode): Integer;
 begin
     if N = nil then
-        Exit(0);
-
-    Result := GetCount(N^.Left);
+        Result := 0
+    else
+        Result := GetCount(N^.Left);
 end;
 
 function TArrayTreap.FindByIndex(N: TNode; Index: Integer): TNode;
 begin
     if N = nil then
-        Exit(nil);
-
-    if Index < GetCount(N^.Left) then
+        Result := nil
+    else if Index < GetCount(N^.Left) then
         Result := FindByIndex(N^.Left, Index)
     else if Index > GetCount(N^.Left) then
         Result := FindByIndex(N^.Right, Index - GetCount(N^.Left) - 1)
@@ -149,8 +175,8 @@ procedure TArrayTreap.Insert(Index: Integer; Value: Integer);
 var
     L, R: TNode;
 begin
-    Split(FRoot, Index - 0, L, R); // Split into left part (before Index) and right part (after Index)
-    Merge(L, L, GetNode(Value)); // Create new node
+    Split(FRoot, Index, L, R); // Split into left part (before Index) and right part (after Index)
+    Merge(L, L, NewNode(Value)); // Create new node
     Merge(FRoot, L, R); // Merge left part, new node, and right part
 end;
 
@@ -158,42 +184,35 @@ procedure TArrayTreap.Delete(Index: Integer);
 var
     L, M, R: TNode;
 begin
-    if (Index < 0) or (Index >= Count) then
-        Exit;
-
-    Split(FRoot, Index, L, R); // Split into left part (before Index) and middle node
-    Split(R, 1, M, R); // Split middle node and right part
-    FreeNode(M);
-    Merge(FRoot, L, R); // Merge left part and right part
+    if (0 <= Index) and (Index < Count) then begin
+        Split(FRoot, Index, L, R); // Split into left part (before Index) and right part
+        Split(R, 1, M, R); // Split middle node and right part
+        FreeNode(M);
+        Merge(FRoot, L, R); // Merge left part and right part
+    end;
 end;
 
 function TArrayTreap.Get(Index: Integer): Integer;
 begin
     if (Index < 0) or (Index >= Count) then
-        Exit(-1); // Or raise an exception
-
-    Result := FindByIndex(FRoot, Index)^.Key;
+        Result := -1 // Or raise an exception
+    else
+        Result := FindByIndex(FRoot, Index)^.Key;
 end;
 
-procedure TArrayTreap.Put(Index: Integer; Value: Integer);
+function TArrayTreap.GetPrefix(Index: Integer): Int64;
+var
+    L, R: TNode;
 begin
-    if (Index < 0) or (Index >= Count) then
-        Exit; // Or raise an exception
-
-    FindByIndex(FRoot, Index)^.Key := Value;
+    Split(FRoot, Index, L, R); // Split into left part (before Index) and right part
+    Result := GetAcc(L);
+    Merge(FRoot, L, R); // Merge left part and right part
 end;
 
-function TArrayTreap.GetCount(N: TNode): Integer;
+procedure TArrayTreap.Update(Index: Integer; Value: Integer);
 begin
-    if N = nil then
-        Exit(0);
-
-    Result := N^.Size;
-end;
-
-function TArrayTreap.GetCount: Integer; overload;
-begin
-    Result := GetCount(FRoot);
+    if (0 <= Index) and (Index < Count) then
+        FindByIndex(FRoot, Index)^.Key := Value;
 end;
 
 var
@@ -211,7 +230,7 @@ begin
 
     for i := 0 to MyArray.Count do
         Writeln('Get(', i, '): ', MyArray.Get(i)); 
-    MyArray.Put(2, -4);
+    MyArray.Update(2, -4);
     MyArray.Insert(5, -25);
     for i := 0 to MyArray.Count do
         Writeln('Get(', i, ') after Insert: ', MyArray.Get(i)); 
