@@ -37,7 +37,7 @@ type
         procedure Insert(Index: Integer; Value: Integer);
         procedure Delete(Index: Integer);
         function Get(Index: Integer): Integer;
-        function GetPrefix(Index: Integer): Int64;
+        function Query(Index1, Index2: Integer): Int64;
         procedure Update(Index: Integer; Value: Integer);
         property Count: Integer read GetCount;
         property Acc: Integer read GetAcc;
@@ -200,12 +200,14 @@ begin
         Result := FindByIndex(FRoot, Index)^.Key;
 end;
 
-function TArrayTreap.GetPrefix(Index: Integer): Int64;
+function TArrayTreap.Query(Index1, Index2: Integer): Int64;
 var
-    L, R: TNode;
+    L, M, R: TNode;
 begin
-    Split(FRoot, Index, L, R); // Split into left part (before Index) and right part
-    Result := GetAcc(L);
+    Split(FRoot, Index2, L, R); // Split into left part (before Index1) and right part
+    Split(L, Index1, L, M); // Split into left part (before Index1) and middle part
+    Result := GetAcc(M);
+    Merge(L, L, M); // Merge left part and middle part
     Merge(FRoot, L, R); // Merge left part and right part
 end;
 
@@ -227,21 +229,25 @@ begin
     MyArray.Insert(2, 4);
     MyArray.Insert(3, 9);
     MyArray.Insert(4, 16);
+    Writeln('Query(1, 3): ', MyArray.Query(1, 3));
+    Writeln('Query(1, 9): ', MyArray.Query(1, 9));
 
     for i := 0 to MyArray.Count do
-        Writeln('Get(', i, '): ', MyArray.Get(i)); 
+        Writeln('Get(', i, '): ', MyArray.Get(i));
     MyArray.Update(2, -4);
     MyArray.Insert(5, -25);
     for i := 0 to MyArray.Count do
-        Writeln('Get(', i, ') after Insert: ', MyArray.Get(i)); 
+        Writeln('Get(', i, ') after Insert: ', MyArray.Get(i));
     MyArray.Delete(3);
     for i := 0 to MyArray.Count do
-        Writeln('Get(', i, ') after Delete: ', MyArray.Get(i)); 
+        Writeln('Get(', i, ') after Delete: ', MyArray.Get(i));
 
     MyArray.Free;
 end.
 
 (*
+Query(1, 3): 5
+Query(1, 9): 30
 Get(0): 0
 Get(1): 1
 Get(2): 4
