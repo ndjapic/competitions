@@ -12,7 +12,7 @@ type
             root, invr: array [0 .. 23] of int32;
         function pow(b, e: int32): int32;
         constructor create;
-        procedure transform(var a: TPolynomial; e: int8; invert: boolean);
+        procedure transform(var a, b: TPolynomial; l: int32; e: int8; invert: boolean);
         procedure mul(var p: TPolynomial; p1, p2: TPolynomial);
     end;
 
@@ -44,22 +44,20 @@ begin
     end;
 end;
 
-procedure TNTT.transform(var a: TPolynomial; e: int8; invert: boolean);
+procedure TNTT.transform(var a, b: TPolynomial; l: int32; e: int8; invert: boolean);
 var
-    a0, a1: TPolynomial;
-    wn, w, h, i: int32;
+    wn, w, h, m, i: int32;
 begin
     if e > 0 then begin
 
         h := int32(1) shl (e-1);
-        setlength(a0, h);
-        setlength(a1, h);
+        m := l+h;
         for i := 0 to h-1 do begin
-            a0[i] := a[2*i];
-            a1[i] := a[2*i+1];
+            b[l+i] := a[l+2*i];
+            b[m+i] := a[l+2*i+1];
         end;
-        transform(a0, e-1, invert);
-        transform(a1, e-1, invert);
+        transform(b, a, l, e-1, invert);
+        transform(b, a, m, e-1, invert);
 
         w := 1;
         if invert then
@@ -68,16 +66,16 @@ begin
             wn := root[e];
 
         for i := 0 to h-1 do begin
-            a1[i] := int64(a1[i]) * w mod prime;
-            a[i] := a0[i] + a1[i];
-            a[i+h] := a0[i] - a1[i];
-            if a[i] >= prime then dec(a[i], prime);
-            if a[i+h] < 0 then inc(a[i+h], prime);
+            b[m+i] := int64(b[m+i]) * w mod prime;
+            a[l+i] := b[l+i] + b[m+i];
+            a[m+i] := b[l+i] - b[m+i];
+            if a[l+i] >= prime then dec(a[l+i], prime);
+            if a[m+i] < 0 then inc(a[m+i], prime);
             w := int64(w) * wn mod prime;
         end;
 
         if invert then
-            for i := 0 to 2*h-1 do begin
+            for i := l to m+h-1 do begin
                 if odd(a[i]) then inc(a[i], prime);
                 a[i] := a[i] div 2;
             end;
@@ -89,6 +87,7 @@ procedure TNTT.mul(var p: TPolynomial; p1, p2: TPolynomial);
 var
     n1, n2, n, i: int32;
     e: int8;
+    q: TPolynomial;
 begin
     n1 := length(p1);
     n2 := length(p2);
@@ -101,15 +100,16 @@ begin
     end;
 
     setlength(p, n);
+    setlength(q, n);
     setlength(p1, n);
     setlength(p2, n);
     for i := n1 to n-1 do p1[i] := 0;
     for i := n2 to n-1 do p2[i] := 0;
 
-    transform(p1, e, false);
-    transform(p2, e, false);
+    transform(p1, q, 0, e, false);
+    transform(p2, q, 0, e, false);
     for i := 0 to n-1 do p[i] := int64(p1[i]) * p2[i] mod prime;
-    transform(p, e, true);
+    transform(p, q, 0, e, true);
 
     while p[n-1] = 0 do dec(n);
     setlength(p, n);
@@ -156,6 +156,7 @@ begin
 
     write('p1 ='); writepoly(p1);
     write('p2 ='); writepoly(p2);
+    write('p3 ='); writepoly(p3);
     write('p ='); writepoly(p);
 
     ntt.free;
@@ -164,6 +165,7 @@ end.
 (*
 p1 = -2 +1*x
 p2 = +2 +1*x
+p3 = +4 +0*x +1*x^2
 p = -16 +0*x +0*x^2 +0*x^3 +1*x^4
 
 
