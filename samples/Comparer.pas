@@ -1,28 +1,34 @@
-program Comparer;
-{$mode objfpc}{$H+}{$J-}
+program Program_Comparer;
+{$MODE DELPHI}
 uses
     Generics.Defaults, Generics.Collections;
 const
     nn = 100 * 1000;
 type
-    intList = specialize TList<int32>;
+    TIntComparer = class(TComparer<int32>)
+        function Compare(constref Left, Right: int32): Integer; override;
+    end;
 var
     n, i: int32;
-    a: intList;
+    Comparer: TIntComparer;
+    a: TList<int32>;
 
-function intCompare(constref Left, Right: int32): int32;
+function TIntComparer.Compare(constref Left, Right: int32): Integer;
 begin
     Result := Left - Right;
 end;
 
 begin
     n := nn div 10;
-    a := intList.Create();
+
+    Comparer := TIntComparer.Create;
+    {Comparer._AddRef;}
+    a := TList<int32>.Create(Comparer);
 
     for i := 0 to nn do a.Add(random(nn));
     for i := 0 to 10 do write(' ', a[i*n]); writeln;
 
-    a.Sort(specialize TComparer<int32>.Construct(@intCompare));
+    a.Sort;
     for i := 0 to 10 do write(' ', a[i*n]); writeln;
     writeln(a.Count);
 end.
