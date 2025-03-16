@@ -22,7 +22,7 @@ begin
     n := nn div 10;
 
     Comparer := TIntComparer.Create;
-    {Comparer._AddRef;}
+    Comparer._AddRef;
     a := TList<int32>.Create(Comparer);
 
     for i := 0 to nn do a.Add(random(nn));
@@ -31,6 +31,10 @@ begin
     a.Sort;
     for i := 0 to 10 do write(' ', a[i*n]); writeln;
     writeln(a.Count);
+
+    a.Free;
+    {Comparer.Free;}
+    Comparer._Release;
 end.
 (*
  54881 36678 74826 38613 39217 88120 75812 79091 36925 50366 30764
