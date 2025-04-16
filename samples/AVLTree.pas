@@ -155,12 +155,12 @@ begin
         end else if t.l = nil then begin
             temp := t;
             t := t.r;
-            temp.r := nil; // Set children to nil before freeing
+            temp.r := nil; // Prevent recursive Destroy
             temp.Free;
         end else if t.r = nil then begin
             temp := t;
             t := t.l;
-            temp.l := nil; // Set children to nil before freeing
+            temp.l := nil; // Prevent recursive Destroy
             temp.Free;
         end else begin // Node with two children
             temp := t.r;
@@ -219,7 +219,7 @@ begin
 end;
 
 var
-    n, i: int32;
+    n, i, x: int32;
     t: TAVLTree<int32>;
 
 procedure dfs(t: TAVLTree<int32>);
@@ -234,6 +234,31 @@ begin
         write(']');
     end;
 end;
+
+begin
+    t := nil;
+
+    for i := 1 to 9 do TAVLTree<int32>.Add(t, i*i);
+    dfs(t); writeln;
+
+    for i := 4 downto 1 do TAVLTree<int32>.Add(t, i*i*i);
+    dfs(t); writeln;
+
+    for i := 1 to 3 do TAVLTree<int32>.Add(t, i*i*i*i);
+    dfs(t); writeln;
+
+    for i := 1 to TAVLTree<int32>.GetTreeSize(t) do begin
+        TAVLTree<int32>.GetAt(t, i-1, x);
+        write(' ',i-1,':',x);
+    end;
+    writeln;
+
+    for i := 1 to 90 do TAVLTree<int32>.Discard(t, i);
+    dfs(t); writeln;
+
+    if t <> nil then
+        t.Free;
+end.
 
 begin
     randomize;
@@ -262,16 +287,4 @@ begin
 
     if t <> nil then
         t.Free;
-end.
-
-begin
-    t := nil;
-    for i := 1 to 9 do TAVLTree<int32>.Add(t, i*i);
-    dfs(t); writeln;
-    for i := 4 downto 1 do TAVLTree<int32>.Add(t, i*i*i);
-    dfs(t); writeln;
-    for i := 1 to 3 do TAVLTree<int32>.Add(t, i*i*i*i);
-    dfs(t); writeln;
-    for i := 1 to 90 do TAVLTree<int32>.Discard(t, i);
-    dfs(t); writeln;
 end.
