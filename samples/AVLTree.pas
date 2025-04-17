@@ -67,9 +67,9 @@ end;
 
 function TAVLTree<_T>.GetBalance(): int8;
 begin
-    if Self = nil then
+    {if Self = nil then
         Result := 0
-    else
+    else}
         Result := GetHeight(r) - GetHeight(l);
 end;
 
@@ -150,9 +150,9 @@ begin
             Discard(t.l, x)
         else if Compare(x, t.x) > 0 then
             Discard(t.r, x)
-        else if t.elementCount > 1 then begin // Element found
-            dec(t.elementCount);
-        end else if t.l = nil then begin
+        else if t.elementCount > 1 then
+            dec(t.elementCount)
+        else if t.l = nil then begin
             temp := t;
             t := t.r;
             temp.r := nil; // Prevent recursive Destroy
@@ -162,14 +162,15 @@ begin
             t := t.l;
             temp.l := nil; // Prevent recursive Destroy
             temp.Free;
-        end else begin // Node with two children
-            temp := t.r;
-            while temp.l <> nil do
-                temp := temp.l;
-            t.x := temp.x;
-            t.elementCount := temp.elementCount;
-            temp.elementCount := 1;
-            Discard(t.r, temp.x);
+        end else begin // Чвор са два потомка
+            if GetHeight(t.l) > GetHeight(t.r) then begin
+                RotateR(t);
+                Discard(t.r, x);
+            end else begin
+                RotateL(t);
+                Discard(t.l, x);
+            end;
+            Exit; // Након ротације и рекурзивног брисања, балансирање ће се обавити при повратку
         end;
 
         if t <> nil then begin
