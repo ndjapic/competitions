@@ -1,7 +1,10 @@
-program dsu;
+program A_Disjoint_Set_Union;
+const
+    nn = 200 * 1000;
 var
-    n, v: int32;
-    dsu, size: array [1 .. maxn] of int32;
+    n, q, i, u, v: int32;
+    tp: int8;
+    dsu, size: array [0 .. nn] of int32;
 
 function find(v: int32): int32;
 begin
@@ -27,10 +30,24 @@ begin
 end;
 
 begin
-    readln(n);
+    readln(n, q);
 
-    for v := 1 to n do begin
+    for v := 0 to n-1 do begin
         dsu[v] := v;
         size[v] := 1;
+    end;
+
+    for i := 1 to q do begin
+        readln(tp, u, v);
+        case tp of
+
+            0: union1(u, v);
+
+            1: if find(u) = find(v) then
+                writeln('1')
+            else
+                writeln('0');
+
+        end;
     end;
 end.
