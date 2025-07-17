@@ -1,60 +1,70 @@
-program fastio; {$H+}
+program fastio;
+{$MODE DELPHI}{$H+}{$INLINE ON}
 uses
-    math;
+	Generics.Defaults, Generics.Collections, sysutils, classes, math;
 const
-    maxn = 200 * 1000;
+	nn = 200 * 1000;
+type
+	TIntComparer = class(TComparer<int32>)
+		function Compare(constref Left, Right: int32): Integer; override;
+	end;
 var
-    notc: int32;
-    n, i, ioi: int32;
-    istr, ostr: string;
-    a, ans: array [1 .. maxn] of int32;
+	notc, tci: int32;
+	n, i: int32;
+	Split: TStringList;
+	Line : string;
+	Comparer: TIntComparer;
+	a: TList<int32>;
+	ans: array [0 .. nn] of int32;
 
-function readdword(): dword;
-var
-    ans: dword;
+function TIntComparer.Compare(constref Left, Right: int32): Integer;
 begin
-    ans := 0;
-    while (istr[ioi] < '0') or (istr[ioi] > '9') do inc(ioi);
-    while (istr[ioi] >= '0') and (istr[ioi] <= '9') do begin
-        ans := ans * 10 + ord(istr[ioi]) - ord('0');
-        inc(ioi);
-    end;
-    readdword := ans;
-end;
-
-procedure writedword(x: dword);
-begin
-    if x >= 10 then writedword(x div 10);
-    inc(ioi);
-    ostr[ioi] := chr(x mod 10 + ord('0'));
+	Result := Left - Right;
 end;
 
 begin
-    pq.n := 0;
-    readln(notc);
-    repeat
+	Split := TStringList.Create;
+	Split.Clear;
+	Split.Delimiter := ' ';
 
-        readln(n, k);
+	Comparer := TIntComparer.Create;
+	Comparer._AddRef;
 
-        readln(istr);
-        istr := istr + ' ';
-        ioi := 1;
+	readln(notc);
+	for tci := 1 to notc do begin
 
-        for i := 1 to n do a[i] := readdword();
+		readln(n);
 
+		readln(Line);
+		Split.DelimitedText := Line;
 
-        setlength(ostr, n*11);
-        ioi := 0;
+		a := TList<int32>.Create(Comparer);
+		for i := 0 to n-1 do a.Add(StrToInt(Split[i]));
+		a.Sort;
 
-        for i := 1 to n do begin
-            writedword(ans[i]);
-            inc(ioi);
-            ostr[ioi] := ' ';
-        end;
+		for i := 0 to a.Count -1 do begin
+			ans[i] := sqr(a[i]);
+			Split[i] := IntToStr(ans[i]);
+		end;
 
-        setlength(ostr, ioi-1);
-        writeln(ostr);
+		writeln(Split.DelimitedText);
+		flush(StdErr); flush(output); // DO NOT REMOVE
+		FreeAndNil(a);
 
-        dec(notc);
-    until notc = 0;
+	end;
+
+	FreeAndNil(Split);
+	{Comparer.Free;}
+	Comparer._Release;
 end.
+(*
+	1
+	5
+	2  5  3  4  1  
+	1 4 9 16 25
+
+
+	------------------
+	(program exited with code: 0)
+	Press return to continue
+* )
