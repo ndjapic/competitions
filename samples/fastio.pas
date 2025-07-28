@@ -11,9 +11,10 @@ type
 var
 	notc, tci: int32;
 	n, i: int32;
+	enu : TList<int32>.TEnumerator;
 	a: TList<int32>;
 	sl: TStringList;
-	ios: string;
+	ios, s: string;
 	Comparer: TIntComparer;
 	ans: array [0 .. nn] of int32;
 
@@ -33,23 +34,24 @@ begin
 	readln(notc);
 	for tci := 1 to notc do begin
 
-		readln(n);
-
+		readln(n); // Note: Local variable "n" is assigned but never used
 		readln(ios);
 		sl.DelimitedText := ios;
 
 		a.Clear;
-		for i := 0 to n-1 do begin
-			a.Add(StrToInt(sl[i]));
-			a.Exchange(i, random(i+1));
+		for s in sl do begin
+			a.Add(StrToInt(s));
+			a.Exchange(a.Count - 1, random(a.Count));
 		end;
 		a.Sort(Comparer);
 
 		sl.Clear;
-		for i := 0 to a.Count -1 do begin
-			ans[i] := sqr(a[i]);
-			sl.Add(IntToStr(ans[i]));
-		end;
+		enu := a.GetEnumerator;
+		for i := 0 to a.Count -1 do
+			if enu.MoveNext then begin
+				ans[i] := sqr(enu.GetCurrent);
+				sl.Add(IntToStr(ans[i]));
+			end;
 
 		writeln(sl.DelimitedText);
 		flush(StdErr); flush(output); // DO NOT REMOVE
@@ -62,13 +64,13 @@ begin
 	{Comparer.Free;}
 end.
 (*
-	1
-	5
-	2  5  3  4  1  
-	1 4 9 16 25
+1
+5
+2  5  3  4  1  
+1 4 9 16 25
 
 
-	------------------
-	(program exited with code: 0)
-	Press return to continue
-* )
+------------------
+(program exited with code: 0)
+Press return to continue
+*)
