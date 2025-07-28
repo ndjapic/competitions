@@ -1,32 +1,32 @@
 program fastio;
-{$MODE DELPHI}{$H+}{$INLINE ON}
+{$MODE DELPHI}{$INLINE ON}
 uses
 	Generics.Defaults, Generics.Collections, sysutils, classes, math;
 const
 	nn = 200 * 1000;
 type
 	TIntComparer = class(TComparer<int32>)
-		function Compare(constref Left, Right: int32): Integer; override;
+		function Compare(constref L, R: int32): Integer; override;
 	end;
 var
 	notc, tci: int32;
 	n, i: int32;
-	Split: TStringList;
-	Line : string;
-	Comparer: TIntComparer;
 	a: TList<int32>;
+	sl: TStringList;
+	ios: string;
+	Comparer: TIntComparer;
 	ans: array [0 .. nn] of int32;
 
-function TIntComparer.Compare(constref Left, Right: int32): Integer;
+function TIntComparer.Compare(constref L, R: int32): Integer;
 begin
-	Result := Left - Right;
+	Result := L - R;
 end;
 
 begin
-	Split := TStringList.Create;
-	Split.Clear;
-	Split.Delimiter := ' ';
-
+	randomize;
+	sl := TStringList.Create;
+	sl.Delimiter := ' ';
+	a := TList<int32>.Create;
 	Comparer := TIntComparer.Create;
 	Comparer._AddRef;
 
@@ -35,27 +35,31 @@ begin
 
 		readln(n);
 
-		readln(Line);
-		Split.DelimitedText := Line;
+		readln(ios);
+		sl.DelimitedText := ios;
 
-		a := TList<int32>.Create(Comparer);
-		for i := 0 to n-1 do a.Add(StrToInt(Split[i]));
-		a.Sort;
+		a.Clear;
+		for i := 0 to n-1 do begin
+			a.Add(StrToInt(sl[i]));
+			a.Exchange(i, random(i+1));
+		end;
+		a.Sort(Comparer);
 
+		sl.Clear;
 		for i := 0 to a.Count -1 do begin
 			ans[i] := sqr(a[i]);
-			Split[i] := IntToStr(ans[i]);
+			sl.Add(IntToStr(ans[i]));
 		end;
 
-		writeln(Split.DelimitedText);
+		writeln(sl.DelimitedText);
 		flush(StdErr); flush(output); // DO NOT REMOVE
-		FreeAndNil(a);
 
 	end;
 
-	FreeAndNil(Split);
-	{Comparer.Free;}
+	FreeAndNil(sl);
+	FreeAndNil(a);
 	Comparer._Release;
+	{Comparer.Free;}
 end.
 (*
 	1
