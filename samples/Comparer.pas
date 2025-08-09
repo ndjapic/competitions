@@ -1,40 +1,51 @@
 program Program_Comparer;
 {$MODE DELPHI}
 uses
-    Generics.Defaults, Generics.Collections;
+	Generics.Defaults, Generics.Collections;
 const
-    nn = 100 * 1000;
+	nn = 100 * 1000;
 type
-    TIntComparer = class(TComparer<int32>)
-        function Compare(constref Left, Right: int32): Integer; override;
-    end;
+	TIntComparer = class(TComparer<int32>)
+		function Compare(constref Left, Right: int32): Integer; override;
+	end;
 var
-    n, i: int32;
-    Comparer: TIntComparer;
-    a: TList<int32>;
+	n, i, ai: int32;
+	Comparer: TIntComparer;
+	a: TList<int32>;
 
 function TIntComparer.Compare(constref Left, Right: int32): Integer;
 begin
-    Result := Left - Right;
+	Result := Left - Right;
 end;
 
 begin
-    n := nn div 10;
+	randomize;
+	Comparer := TIntComparer.Create;
+	Comparer._AddRef;
+	a := TList<int32>.Create;
+	try
 
-    Comparer := TIntComparer.Create;
-    Comparer._AddRef;
-    a := TList<int32>.Create(Comparer);
+		n := nn div 10;
 
-    for i := 0 to nn do a.Add(random(nn));
-    for i := 0 to 10 do write(' ', a[i*n]); writeln;
+		for i := 0 to nn do begin
+			ai := random(nn);
+			{read(ai);}
+			a.Add(ai);
+			a.Exchange(i, random(i+1));
+		end;
+		{readln;}
 
-    a.Sort;
-    for i := 0 to 10 do write(' ', a[i*n]); writeln;
-    writeln(a.Count);
+		for i := 0 to 10 do write(' ', a[i*n]); writeln;
 
-    a.Free;
-    {Comparer.Free;}
-    Comparer._Release;
+		a.Sort(Comparer);
+		for i := 0 to 10 do write(' ', a[i*n]); writeln;
+		writeln(a.Count);
+
+	finally
+		a.Free;
+		{Comparer.Free;}
+		Comparer._Release;
+	end;
 end.
 (*
  54881 36678 74826 38613 39217 88120 75812 79091 36925 50366 30764
