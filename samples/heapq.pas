@@ -1,117 +1,110 @@
-program heapq;
-{$mode objfpc}{$h+}
+program B_Get_Min;
+{$MODE DELPHI}
 uses
-    Generics.Defaults;
-const
-    nn = 100 * 1000;
-
+	Generics.Collections;
 type
-    generic TPrioQueue<T> = class
-    public
-        items: array of T;
-        n: int32;
-        constructor Create();
-        function Compare(l, r: T): int32;
-        procedure setItem(v: int32; x: T);
-        procedure swim(v: int32; x: T);
-        procedure enqueue(x: T);
-        function prioChild(u: int32): int32;
-        procedure sink(u: int32; x: T);
-        procedure dequeue(u: int32);
-    end;
-    iPrioQueue = specialize TPrioQueue<int32>;
-
+	TMyComparer<_T> = class
+		function Compare(constref Left, Right: _T): Integer;
+	end;
+	THeap<_T> = class
+	public
+		Items: TList<_T>;
+		constructor Create;
+		destructor Destroy; override;
+		procedure Push(Item: _T);
+		function Favorite(u: SizeInt): SizeInt;
+		function Pop: _T;
+	end;
 var
-    n, i: int32;
-    a: array [1 .. nn] of int32;
-    pq: iPrioQueue;
+	q, x, i, tp: int8;
+	Comparer: TMyComparer<int8>;
+	pq: THeap<int8>;
 
-constructor TPrioQueue.Create();
+function TMyComparer<_T>.Compare(constref Left, Right: _T): Integer;
 begin
-    setlength(items, 1);
-    n := 0;
+	Result := Left - Right;
 end;
 
-function TPrioQueue.Compare(l, r: T): int32;
+constructor THeap<_T>.Create;
 begin
-    result := l - r;
+	Inherited Create;
+	Items := TList<_T>.Create;
 end;
 
-procedure TPrioQueue.setItem(v: int32; x: T);
+destructor THeap<_T>.Destroy;
 begin
-    items[v] := x;
+	// Perform cleanup specific to THeap here
+	Items.Free;
+	inherited Destroy; // Call the parent destructor
 end;
 
-procedure TPrioQueue.swim(v: int32; x: T);
+procedure THeap<_T>.Push(Item: _T);
 var
-    u: int32;
+	u, v: SizeInt;
 begin
-    u := (v-1) div 2;
-    while (v > 0) and (Compare(x, items[u]) < 0) do begin
-        setItem(v, items[u]);
-        v := u;
-        u := (v-1) div 2;
-    end;
-    setItem(v, x);
+	v := Items.Count;
+	Items.Add(Item);
+	u := (v-1) div 2;
+	while (v > 0) and (Comparer.Compare(Items[v], Items[u]) < 0) do begin
+		Items.Exchange(u, v);
+		v := u;
+		u := (v-1) div 2;
+	end;
 end;
 
-procedure TPrioQueue.enqueue(x: T);
-begin
-    inc(n);
-    if length(items) <= n then setlength(items, 2*n);
-    swim(n-1, x);
-end;
-
-function TPrioQueue.prioChild(u: int32): int32;
+function THeap<_T>.Favorite(u: SizeInt): SizeInt;
 var
-    v: int32;
+	v: SizeInt;
 begin
-    v := u * 2 + 1;
-    if (v+1 < n) and (Compare(items[v+1], items[v]) < 0) then inc(v);
-    result := v;
+	v := u * 2 + 2;
+	if (v >= Items.Count) or (Comparer.Compare(Items[v], Items[v-1]) >= 0) then
+		dec(v);
+	Result := v;
 end;
 
-procedure TPrioQueue.sink(u: int32; x: T);
+function THeap<_T>.Pop: _T;
 var
-    v: int32;
+	u, v: SizeInt;
 begin
-    v := prioChild(u);
-    while (v < n) and (Compare(items[v], x) < 0) do begin
-        setItem(u, items[v]);
-        u := v;
-        v := prioChild(u);
-    end;
-    setItem(u, x);
+	Result := Items[0]; // Get the first element
+	Items[0] := Items[Items.Count - 1];
+	// If the Item itself needs to be freed, free it before deleting from the list
+	// Items[Items.Count - 1].Free;
+	// FreeAndNil(Items[Items.Count - 1]);
+	Items.Delete(Items.Count - 1); // Remove the last element
+	u := 0;
+	v := Favorite(u);
+	while (v < Items.Count) and (Comparer.Compare(Items[v], Items[u]) < 0) do begin
+		Items.Exchange(u, v);
+		u := v;
+		v := Favorite(u);
+	end;
 end;
 
-procedure TPrioQueue.dequeue(u: int32);
 begin
-    if length(items) >= 4*n then setlength(items, 2*n);
-    dec(n);
-    sink(u, items[n]);
-end;
+	Comparer := TMyComparer<int8>.Create;
+	pq := THeap<int8>.Create;
+	try
 
-begin
-    readln(n);
-    pq := iPrioQueue.Create();
+		readln(q);
 
-    for i := 1 to n do begin
-        read(a[i]);
-        pq.enqueue(a[i]);
-        write(' ', a[i]);
-    end;
-    readln;
-    writeln;
+		for i := 1 to q do begin
+			read(tp);
+			case tp of
 
-    for i := 1 to n do begin
-        a[i] := pq.items[0];
-        pq.dequeue(0);
-        write(' ', a[i]);
-    end;
-    writeln;
+				1: begin
+					read(x);
+					pq.Push(x);
+				end;
+
+				2: writeln(pq.Pop);
+
+			end;
+			readln;
+		end;
+
+	finally
+		pq.Free;
+		Comparer.Free;
+	end;
 end.
-
-(*
-10
-2 8 32 128 512 1024 256 64 16 4
-*)
