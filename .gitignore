@@ -34,3 +34,9 @@ __pycache__/
 # Archive files
 *.zip
 *.tar.gz
+
+# Other common binary types
+*.rar
+*.7z
+*.pdf
+*.mp3
