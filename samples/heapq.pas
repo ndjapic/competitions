@@ -3,13 +3,12 @@ program B_Get_Min;
 uses
 	Generics.Collections;
 type
-	TMyComparer<_T> = class
-		function Compare(constref Left, Right: _T): Integer;
+	THeapComparer<_T> = class
+		function Compare(constref Left, Right: _T): SizeInt;
 	end;
 	THeap<_T> = class
 	private
 		FItems: TList<_T>;
-		// Privatna funkcija za poređenje elemenata
 		function Favorite(u: SizeInt): SizeInt;
 		function GetItem(Index: SizeInt): _T;
 		function GetCount: SizeInt;
@@ -22,6 +21,13 @@ type
 		property Items[Index: SizeInt]: _T read GetItem; default;
 	end;
 
+var
+	q, x, i, tp: int8;
+	Comparer: THeapComparer<int8>;
+	pq: THeap<int8>;
+
+// Implementacija metode THeapComparer<_T>.Compare
+function THeapComparer<_T>.Compare(constref Left, Right: _T): SizeInt;
 begin
 	Result := Left - Right;
 end;
@@ -32,7 +38,7 @@ var
 	v: SizeInt;
 begin
 	v := u * 2 + 2;
-	if (v >= FItems.Count) or (Compare(FItems[v-1], FItems[v]) < 0) then
+	if (v >= Count) or (Comparer.Compare(FItems[v-1], FItems[v]) < 0) then
 		dec(v);
 	Result := v;
 end;
@@ -63,10 +69,10 @@ procedure THeap<_T>.Push(Item: _T);
 var
 	u, v: SizeInt;
 begin
-	v := FItems.Count;
+	v := Count;
 	FItems.Add(Item);
 	u := (v-1) div 2;
-	while (v > 0) and (Compare(FItems[v], FItems[u]) < 0) do begin
+	while (v > 0) and (Comparer.Compare(FItems[v], FItems[u]) < 0) do begin
 		FItems.Exchange(u, v);
 		v := u;
 		u := (v-1) div 2;
@@ -77,14 +83,14 @@ function THeap<_T>.Pop: _T;
 var
 	u, v: SizeInt;
 begin
-	// If the Item itself needs to be freed, free it before deleting from the list
 	Result := FItems[0];
-	FItems[0] := FItems[FItems.Count - 1];
-	FItems.Delete(FItems.Count - 1);
+	FItems[0] := FItems[Count - 1];
+	// If the Item itself needs to be freed, free it before deleting from the list
+	FItems.Delete(Count - 1);
 
 	u := 0;
 	v := Favorite(u);
-	while (v < FItems.Count) and (Compare(FItems[v], FItems[u]) < 0) do begin
+	while (v < Count) and (Comparer.Compare(FItems[v], FItems[u]) < 0) do begin
 		FItems.Exchange(u, v);
 		u := v;
 		v := Favorite(u);
@@ -92,13 +98,9 @@ begin
 end;
 
 // Glavni programski blok
-var
-	q, x, i, tp: int8;
-	pq: THeap<int8>;
-
 begin
-	Comparer := TMyComparer<int8>.Create;
 	readln(q);
+	Comparer := THeapComparer<int8>.Create;
 	pq := THeap<int8>.Create;
 	try
 		for i := 1 to q do begin
