@@ -1,36 +1,36 @@
-    # Ignore all files within the 'bin' directory
-    bin/
+# Ignore all files within the 'bin' directory
+bin/
 
-    # Ignore all files within the 'build' directory
-    build/
+# Ignore all files within the 'build' directory
+build/
 
-    # Compiled executables
-    *.exe
-    *.dll
-    *.so
-    *.dylib
+# Compiled executables
+*.exe
+*.dll
+*.so
+*.dylib
 
-    # Object files and archives
-    *.o
-    *.a
+# Object files and archives
+*.o
+*.a
 
-    # Compiled Python files
-    *.pyc
-    *.pyo
-    __pycache__/
+# Compiled Python files
+*.pyc
+*.pyo
+__pycache__/
 
-    # Java class files
-    *.class
+# Java class files
+*.class
 
-    # Image files
-    *.jpg
-    *.png
-    *.gif
+# Image files
+*.jpg
+*.png
+*.gif
 
-    # Video files
-    *.mp4
-    *.mov
+# Video files
+*.mp4
+*.mov
 
-    # Archive files
-    *.zip
-    *.tar.gz
+# Archive files
+*.zip
+*.tar.gz
