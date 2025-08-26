@@ -4,9 +4,9 @@ uses
 	Generics.Collections;
 type
 	THeapComparer<_T> = class
-		function Compare(constref Left, Right: _T): SizeInt;
+		class function Compare(constref Left, Right: _T): SizeInt;
 	end;
-	THeap<_T> = class
+	THeap<_T, _C> = class
 	private
 		FItems: TList<_T>;
 		function Favorite(u: SizeInt): SizeInt;
@@ -23,63 +23,63 @@ type
 
 var
 	q, x, i, tp: int8;
-	Comparer: THeapComparer<int8>;
-	pq: THeap<int8>;
+	pq: THeap<int32, THeapComparer<int32>>;
 
-// Implementacija metode THeapComparer<_T>.Compare
-function THeapComparer<_T>.Compare(constref Left, Right: _T): SizeInt;
+// THeapComparer<_T>
+class function THeapComparer<_T>.Compare(constref Left, Right: _T): SizeInt;
 begin
 	Result := Left - Right;
 end;
 
-// Implementacija metoda THeap<_T>
-function THeap<_T>.Favorite(u: SizeInt): SizeInt;
+// THeap<_T, _C>
+function THeap<_T, _C>.Favorite(u: SizeInt): SizeInt;
 var
 	v: SizeInt;
 begin
 	v := u * 2 + 2;
-	if (v >= Count) or (Comparer.Compare(FItems[v-1], FItems[v]) < 0) then
+	if (v >= Count) or (_C.Compare(FItems[v-1], FItems[v]) < 0) then
 		dec(v);
 	Result := v;
 end;
 
-function THeap<_T>.GetItem(Index: SizeInt): _T;
+function THeap<_T, _C>.GetItem(Index: SizeInt): _T;
 begin
 	Result := FItems[Index];
 end;
 
-function THeap<_T>.GetCount: SizeInt;
+function THeap<_T, _C>.GetCount: SizeInt;
 begin
 	Result := FItems.Count;
 end;
 
-constructor THeap<_T>.Create;
+constructor THeap<_T, _C>.Create;
 begin
 	Inherited Create;
 	FItems := TList<_T>.Create;
+	{FItems.OwnsObjects := False;}
 end;
 
-destructor THeap<_T>.Destroy;
+destructor THeap<_T, _C>.Destroy;
 begin
 	FItems.Free;
 	inherited Destroy;
 end;
 
-procedure THeap<_T>.Push(Item: _T);
+procedure THeap<_T, _C>.Push(Item: _T);
 var
 	u, v: SizeInt;
 begin
 	v := Count;
 	FItems.Add(Item);
 	u := (v-1) div 2;
-	while (v > 0) and (Comparer.Compare(FItems[v], FItems[u]) < 0) do begin
+	while (v > 0) and (_C.Compare(FItems[v], FItems[u]) < 0) do begin
 		FItems.Exchange(u, v);
 		v := u;
 		u := (v-1) div 2;
 	end;
 end;
 
-function THeap<_T>.Pop: _T;
+function THeap<_T, _C>.Pop: _T;
 var
 	u, v: SizeInt;
 begin
@@ -90,7 +90,7 @@ begin
 
 	u := 0;
 	v := Favorite(u);
-	while (v < Count) and (Comparer.Compare(FItems[v], FItems[u]) < 0) do begin
+	while (v < Count) and (_C.Compare(FItems[v], FItems[u]) < 0) do begin
 		FItems.Exchange(u, v);
 		u := v;
 		v := Favorite(u);
@@ -100,8 +100,7 @@ end;
 // Glavni programski blok
 begin
 	readln(q);
-	Comparer := THeapComparer<int8>.Create;
-	pq := THeap<int8>.Create;
+	pq := THeap<int32, THeapComparer<int32>>.Create;
 	try
 		for i := 1 to q do begin
 			read(tp);
@@ -116,6 +115,5 @@ begin
 		end;
 	finally
 		pq.Free;
-		Comparer.Free;
 	end;
 end.
