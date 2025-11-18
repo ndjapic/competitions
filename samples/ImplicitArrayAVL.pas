@@ -1,7 +1,7 @@
 {$MODE DELPHI}
 program ImplicitArrayAVL;
 
-{---------------------------------------------------------------
+(*---------------------------------------------------------------
  Generic implicit array with AVL tree + lazy segment tree features
  - Works under {$MODE DELPHI} using Delphi-style generics
  - Usage:
@@ -15,10 +15,10 @@ program ImplicitArrayAVL;
        RangeAdd(l, r, d)       add d on interval
        RangeMax(l, r)          max on interval
  - Node stores: height, cnt, max, lazy_add
----------------------------------------------------------------}
+---------------------------------------------------------------*)
 
 uses
-  SysUtils;
+  SysUtils, Math;
 
 type
   { Generic implicit AVL array }
@@ -240,19 +240,19 @@ begin
 end;
 
 function TImplicitArray<T>.RangeMaxNode(p: PNode; l, r: Integer): T;
-var L, idx: Integer; res, t: T;
+var {L,} idx: Integer; res, tmp: T;
 begin
   if (p = nil) or (l > r) then Exit(Low(T));
   PushDown(p);
-  L := CountOf(p^.left);
-  idx := L;
+  {L} idx := CountOf(p^.left);
+  {idx := L;}
 
   res := Low(T);
 
   if l < idx then
   begin
-    t := RangeMaxNode(p^.left, l, Min(r, idx-1));
-    if t > res then res := t;
+    tmp := RangeMaxNode(p^.left, l, Min(r, idx-1));
+    if tmp > res then res := tmp;
   end;
   if (l <= idx) and (idx <= r) then
   begin
@@ -260,14 +260,14 @@ begin
   end;
   if r > idx then
   begin
-    t := RangeMaxNode(p^.right, Max(0, l-idx-1), r-idx-1);
-    if t > res then res := t;
+    tmp := RangeMaxNode(p^.right, Max(0, l-idx-1), r-idx-1);
+    if tmp > res then res := tmp;
   end;
   Result := res;
 end;
 
 procedure TImplicitArray<T>.RangeAddNode(p: PNode; l, r: Integer; const d: T);
-var L, idx: Integer;
+var {L,} idx: Integer;
 begin
   if (p = nil) or (l > r) then Exit;
   if (l = 0) and (r = CountOf(p)-1) then
@@ -278,8 +278,8 @@ begin
     Exit;
   end;
   PushDown(p);
-  L := CountOf(p^.left);
-  idx := L;
+  {L} idx := CountOf(p^.left);
+  {idx := L;}
 
   if l < idx then
     RangeAddNode(p^.left, l, Min(r, idx-1), d);
@@ -345,9 +345,10 @@ begin
   Result := RangeMaxNode(root, l, r);
 end;
 
+var ia: TImplicitArray<Int32>;
+
 begin
   { Demo – delete or modify for contest usage }
-  var ia: TImplicitArray<Int32>;
   ia := TImplicitArray<Int32>.Create;
   ia.InsertAt(0, 5);
   ia.InsertAt(1, 7);
