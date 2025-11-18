@@ -1,4 +1,4 @@
-{$MODE DELPHI}
+{$MODE DELPHI}{$INLINE ON}
 program ImplicitArrayAVL;
 
 (*---------------------------------------------------------------
@@ -79,18 +79,17 @@ type
 
 function TImplicitArray<T>.Height(p: PNode): Integer;
 begin
-  if p = nil then Exit(0); Result := p^.height;
+  if p = nil then Result := 0 else Result := p^.height;
 end;
 
 function TImplicitArray<T>.CountOf(p: PNode): Integer;
 begin
-  if p = nil then Exit(0); Result := p^.cnt;
+  if p = nil then Result := 0 else Result := p^.cnt;
 end;
 
 function TImplicitArray<T>.GetMx(p: PNode): T;
 begin
-  if p = nil then Exit(Low(T));
-  Result := p^.mx;
+  if p = nil then Result := Low(T) else Result := p^.mx;
 end;
 
 function TImplicitArray<T>.NewNode(const v: T): PNode;
@@ -109,48 +108,47 @@ procedure TImplicitArray<T>.PushUp(p: PNode);
 begin
   p^.cnt := 1 + CountOf(p^.left) + CountOf(p^.right);
   p^.mx := p^.val;
-  if (p^.left <> nil) and (p^.left^.mx > p^.mx) then p^.mx := p^.left^.mx;
-  if (p^.right <> nil) and (p^.right^.mx > p^.mx) then p^.mx := p^.right^.mx;
+  if p^.left <> nil then p^.mx := Max(p^.mx, p^.left^.mx);
+  if p^.right <> nil then p^.mx := Max(p^.mx, p^.right^.mx);
   p^.height := 1 + Max(Height(p^.left), Height(p^.right));
 end;
 
 procedure TImplicitArray<T>.PushDown(p: PNode);
 begin
-  if (p = nil) or (p^.lazy = 0) then Exit;
-  if p^.left <> nil then
-  begin
-    Inc(p^.left^.val, p^.lazy);
-    Inc(p^.left^.mx, p^.lazy);
-    Inc(p^.left^.lazy, p^.lazy);
-  end;
-  if p^.right <> nil then
-  begin
-    Inc(p^.right^.val, p^.lazy);
-    Inc(p^.right^.mx, p^.lazy);
-    Inc(p^.right^.lazy, p^.lazy);
-  end;
-  p^.lazy := 0;
+	if (p <> nil) and (p^.lazy <> 0) then begin
+	  if p^.left <> nil then
+	  begin
+		Inc(p^.left^.val, p^.lazy);
+		Inc(p^.left^.mx, p^.lazy);
+		Inc(p^.left^.lazy, p^.lazy);
+	  end;
+	  if p^.right <> nil then
+	  begin
+		Inc(p^.right^.val, p^.lazy);
+		Inc(p^.right^.mx, p^.lazy);
+		Inc(p^.right^.lazy, p^.lazy);
+	  end;
+	  p^.lazy := 0;
+	end;
 end;
 
 function TImplicitArray<T>.RotateLeft(x: PNode): PNode;
-var y, T2: PNode;
+var y: PNode;
 begin
   y := x^.right;
-  T2 := y^.left;
+  x^.right := y^.left;
   y^.left := x;
-  x^.right := T2;
   PushUp(x);
   PushUp(y);
   Result := y;
 end;
 
 function TImplicitArray<T>.RotateRight(y: PNode): PNode;
-var x, T2: PNode;
+var x: PNode;
 begin
   x := y^.left;
-  T2 := x^.right;
+  y^.left := x^.right;
   x^.right := y;
-  y^.left := T2;
   PushUp(y);
   PushUp(x);
   Result := x;
@@ -159,21 +157,18 @@ end;
 function TImplicitArray<T>.Balance(p: PNode): PNode;
 var bf: Integer;
 begin
-  if p = nil then Exit(nil);
-  PushUp(p);
-  bf := Height(p^.left) - Height(p^.right);
+  if p <> nil then begin
+	  PushUp(p);
+	  bf := Height(p^.left) - Height(p^.right);
 
-  if bf > 1 then
-  begin
-    if Height(p^.left^.right) > Height(p^.left^.left) then
-      p^.left := RotateLeft(p^.left);
-    Exit(RotateRight(p));
-  end;
-  if bf < -1 then
-  begin
-    if Height(p^.right^.left) > Height(p^.right^.right) then
-      p^.right := RotateRight(p^.right);
-    Exit(RotateLeft(p));
+	  if bf > 1 then begin
+		if Height(p^.left^.right) > Height(p^.left^.left) then p^.left := RotateLeft(p^.left);
+		Exit(RotateRight(p));
+	  end;
+	  if bf < -1 then begin
+		if Height(p^.right^.left) > Height(p^.right^.right) then p^.right := RotateRight(p^.right);
+		Exit(RotateLeft(p));
+	  end;
   end;
   Result := p;
 end;
@@ -183,9 +178,9 @@ var L: Integer;
 begin
   PushDown(p);
   L := CountOf(p^.left);
-  if idx < L then Exit(GetAtNode(p^.left, idx));
-  if idx = L then Exit(p^.val);
-  Exit(GetAtNode(p^.right, idx - L - 1));
+  if idx < L then Result := GetAtNode(p^.left, idx)
+  else if idx = L then Result := p^.val
+  else Result := GetAtNode(p^.right, idx - L - 1);
 end;
 
 function TImplicitArray<T>.SetAtNode(p: PNode; idx: Integer; const v: T): PNode;
@@ -203,13 +198,15 @@ end;
 function TImplicitArray<T>.InsertAtNode(p: PNode; idx: Integer; const v: T): PNode;
 var L: Integer;
 begin
-  if p = nil then Exit(NewNode(v));
-  PushDown(p);
-  L := CountOf(p^.left);
-  if idx <= L then p^.left := InsertAtNode(p^.left, idx, v)
-  else p^.right := InsertAtNode(p^.right, idx - L - 1, v);
-  PushUp(p);
-  Result := Balance(p);
+  if p = nil then Result := NewNode(v)
+  else begin
+	  PushDown(p);
+	  L := CountOf(p^.left);
+	  if idx <= L then p^.left := InsertAtNode(p^.left, idx, v)
+	  else p^.right := InsertAtNode(p^.right, idx - L - 1, v);
+	  PushUp(p);
+	  Result := Balance(p);
+  end;
 end;
 
 function TImplicitArray<T>.DeleteAtNode(p: PNode; idx: Integer): PNode;
@@ -240,55 +237,38 @@ begin
 end;
 
 function TImplicitArray<T>.RangeMaxNode(p: PNode; l, r: Integer): T;
-var {L,} idx: Integer; res, tmp: T;
+var idx: Integer; res: T;
 begin
   if (p = nil) or (l > r) then Exit(Low(T));
   PushDown(p);
-  {L} idx := CountOf(p^.left);
-  {idx := L;}
+  idx := CountOf(p^.left);
 
   res := Low(T);
-
-  if l < idx then
-  begin
-    tmp := RangeMaxNode(p^.left, l, Min(r, idx-1));
-    if tmp > res then res := tmp;
-  end;
-  if (l <= idx) and (idx <= r) then
-  begin
-    if p^.val > res then res := p^.val;
-  end;
-  if r > idx then
-  begin
-    tmp := RangeMaxNode(p^.right, Max(0, l-idx-1), r-idx-1);
-    if tmp > res then res := tmp;
-  end;
+  if l < idx then res := Max(res, RangeMaxNode(p^.left, l, Min(r, idx-1)));
+  if (l <= idx) and (idx <= r) then res := Max(res, p^.val);
+  if r > idx then res := Max(res, RangeMaxNode(p^.right, Max(0, l-idx-1), r-idx-1));
   Result := res;
 end;
 
 procedure TImplicitArray<T>.RangeAddNode(p: PNode; l, r: Integer; const d: T);
-var {L,} idx: Integer;
+var idx: Integer;
 begin
-  if (p = nil) or (l > r) then Exit;
-  if (l = 0) and (r = CountOf(p)-1) then
-  begin
-    Inc(p^.val, d);
-    Inc(p^.mx, d);
-    Inc(p^.lazy, d);
-    Exit;
+  if (p <> nil) and (l <= r) then begin
+	  if (l = 0) and (r = CountOf(p)-1) then begin
+		Inc(p^.val, d);
+		Inc(p^.mx, d);
+		Inc(p^.lazy, d);
+	  end else begin
+		PushDown(p);
+		idx := CountOf(p^.left);
+
+		if l < idx then RangeAddNode(p^.left, l, Min(r, idx-1), d);
+		if (l <= idx) and (idx <= r) then Inc(p^.val, d);
+		if r > idx then RangeAddNode(p^.right, Max(0, l-idx-1), r-idx-1, d);
+
+		PushUp(p);
+	  end;
   end;
-  PushDown(p);
-  {L} idx := CountOf(p^.left);
-  {idx := L;}
-
-  if l < idx then
-    RangeAddNode(p^.left, l, Min(r, idx-1), d);
-  if (l <= idx) and (idx <= r) then
-    Inc(p^.val, d);
-  if r > idx then
-    RangeAddNode(p^.right, Max(0, l-idx-1), r-idx-1, d);
-
-  PushUp(p);
 end;
 
 procedure TImplicitArray<T>.FreeNode(p: PNode);
@@ -345,15 +325,19 @@ begin
   Result := RangeMaxNode(root, l, r);
 end;
 
-var ia: TImplicitArray<Int32>;
+var
+  n, i, h: int32;
+  ia: TImplicitArray<Int32>;
 
 begin
   { Demo – delete or modify for contest usage }
+  n := 100 * 1000;
+
   ia := TImplicitArray<Int32>.Create;
-  ia.InsertAt(0, 5);
-  ia.InsertAt(1, 7);
-  ia.InsertAt(2, 3);
-  ia.RangeAdd(0,2,2); { +2 to all }
-  Writeln(ia.RangeMax(0,2)); { prints 9 }
+  for i := 0 to n-1 do ia.InsertAt(i, i);
+  h := n div 2;
+  ia.RangeAdd(h, n-1, -h); { -h to second half }
+  Writeln(ia.RangeMax(100, n-101)); { prints ??? }
   ia.Free;
+
 end.
