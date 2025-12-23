@@ -22,7 +22,6 @@ type
         function GetAt(i: Integer): _T;
         property At[i: Integer]: _T Read GetAt; default;
     end;
-    TIntTreap = TSortedTreap<Int32>;
 
 (* BEGIN TSortedTreap *)
 
@@ -185,7 +184,7 @@ end;
 
 var
     n, i, K: Integer;
-    a: TIntTreap;
+    a: TSortedTreap<Int32>;
 
 begin
     Randomize;
@@ -194,18 +193,18 @@ begin
 
     for i := 0 to n-1 do begin
         Read(K);
-        TIntTreap.Insort(a, K);
+        TSortedTreap<Int32>.Insort(a, K);
         Write('After Insort ', K, ': '); a.dfs; WriteLn;
     end;
     ReadLn;
 
-    TIntTreap.Discard(a, 9); // Delete one of two nines.
-    TIntTreap.Discard(a, 10); // Does nothing.
+    TSortedTreap<Int32>.Discard(a, 9); // Delete one of two nines.
+    TSortedTreap<Int32>.Discard(a, 10); // Does nothing.
     n := a.Size; // Update n.
 
     for i := 0 to n-1 do begin
       Write('Before Discard ', a[0], ': '); a.dfs; WriteLn;
-      TIntTreap.Discard(a, a[0]);
+      TSortedTreap<Int32>.Discard(a, a[0]);
     end;
     a.Free;
 end.
