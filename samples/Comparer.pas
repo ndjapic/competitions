@@ -27,10 +27,11 @@ begin
 
 		n := nn div 10;
 
+		ai := 0;
 		for i := 0 to nn do begin
-			ai := random(nn);
-			{read(ai);}
 			a.Add(ai);
+			a[i] := random(nn);
+			{read(a[i]);}
 			a.Exchange(i, random(i+1));
 		end;
 		{readln;}
