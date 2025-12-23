@@ -1,0 +1,7 @@
+n = int(input())
+k = int(input())
+ner = sum(int(input()) for ocena in range(k))
+med = float(input())
+uku = round(med * n)
+gim = (uku - ner) / (n-k)
+print('{:.2f}'.format(gim))
