@@ -19,6 +19,14 @@ build/
 *.pyo
 __pycache__/
 
+# CP Editor input and output files
+*.in
+*.ans
+
+# Geany ppas.sh and link?????.res files
+*.sh
+*.res
+
 # Java class files
 *.class
 
