@@ -23,7 +23,7 @@ __pycache__/
 *.in
 *.ans
 
-# Geany ppas.sh and link?????.res files
+# Geany ppas.sh and link12345.res files
 *.sh
 *.res
 
