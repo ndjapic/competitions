@@ -72,3 +72,4 @@ begin
     readln(n);
     writeln(c[isqrt(n)]);
 end.
+

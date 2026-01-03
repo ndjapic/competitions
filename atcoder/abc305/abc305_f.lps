@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="abc305_f.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="13"/>
+        <CursorPos X="31" Y="19"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="7">
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="34" Column="28" TopLine="8"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="3" Column="12" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="24" Column="65" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="23" Column="28" TopLine="18"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="26" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="48" TopLine="17"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="30" Column="81" TopLine="7"/>
+      </Position>
+      <Position>
+        <Filename Value="abc305_f.lpr"/>
+        <Caret Line="36" Column="56" TopLine="10"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

@@ -9,12 +9,10 @@ var
     a: array [1 .. maxn] of int16;
 
 begin
-    {readln(ntc);}
-    ntc := 1000;
+    readln(ntc);
     for tci := 1 to ntc do begin
 
-		{readln(x);}
-		x := tci+1;
+		readln(x);
         n := 0;
 
         while x > 0 do begin

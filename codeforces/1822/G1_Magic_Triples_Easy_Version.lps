@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="41"/>
+        <CursorPos Y="58"/>
+        <UsageCount Value="29"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="11">
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="43" Column="28" TopLine="18"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="28" Column="17" TopLine="11"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="42" Column="31" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="54" Column="10" TopLine="28"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="42" Column="16" TopLine="34"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="89" Column="20" TopLine="59"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="87" Column="71" TopLine="58"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="73" Column="48" TopLine="62"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="90" Column="67" TopLine="60"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="9" Column="13"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="88" Column="50" TopLine="64"/>
+      </Position>
+      <Position>
+        <Filename Value="G1_Magic_Triples_Easy_Version.pas"/>
+        <Caret Line="62" Column="17" TopLine="48"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode="default">
+        <Mode Name="default"/>
+      </Modes>
+    </RunParams>
+    <HistoryLists>
+      <List Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="/usr/bin/qterminal -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </List>
+    </HistoryLists>
+  </ProjectSession>
+</CONFIG>

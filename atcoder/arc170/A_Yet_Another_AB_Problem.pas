@@ -3,59 +3,62 @@ program A_Yet_Another_AB_Problem;
 const
     maxn = 200 * 1000;
 var
-    n, i, j, aa, ba, bb, ans: int32;
+    n, i, a, b, d, ans: int32;
     s, t: string;
-    link: array [1 .. maxn] of int32;
+
+function ab(i: int32): boolean;
+begin
+    ab := (s[i] = 'A') and (t[i] = 'B');
+end;
+
+function ba(i: int32): boolean;
+begin
+    ba := (s[i] = 'B') and (t[i] = 'A');
+end;
 
 begin
     readln(n);
     readln(s);
     readln(t);
 
-    aa := 0;
-    ba := 0;
-    bb := 0;
     ans := 0;
 
-    for j := 1 to n do
+    a := 0;
+    i := 1;
+    while (i <= n) and not ab(i) do begin
+        if t[i] = 'A' then inc(a);
+        inc(i);
+    end;
+
+    if (i <= n) and (a = 0) then ans := -1;
+
+    if ans > -1 then begin
+
+        b := 0;
+        i := n;
+        while (i > 0) and not ba(i) do begin
+            if t[i] = 'B' then inc(b);
+            dec(i);
+        end;
+
+        if (i > 0) and (b = 0) then ans := -1;
+
         if ans > -1 then begin
 
-            if (s[j] = 'A') and (t[j] = 'A') then begin
-                link[j] := aa;
-                aa := j;
-            end else if (s[j] = 'A') and (t[j] = 'B') then begin
-
-                inc(ans);
-                link[j] := bb;
-                bb := j;
-
-                if ba > 0 then begin
-                    i := link[ba];
-                    ba := link[ba];
-                    link[i] := aa;
-                    aa := i;
-                end else if aa > 0 then
-                    (* aa := link[aa] *)
-                else
-                    ans := -1;
-
-            end else if (s[j] = 'B') and (t[j] = 'A') then begin
-                link[j] := ba;
-                ba := j;
-            end else if (s[j] = 'B') and (t[j] = 'B') then begin
-                link[j] := bb;
-                bb := j;
+            d := 0;
+            for i := 1 to n do begin
+                if ba(i) then
+                    inc(d)
+                else if ab(i) then begin
+                    if d > 0 then dec(d);
+                    inc(ans);
+                end;
             end;
+            inc(ans, d);
 
         end;
 
-    while (ba > 0) and (ans > -1) do
-        if ba < bb then begin
-            inc(ans);
-            bb := link[bb];
-            ba := link[ba];
-        end else
-            ans := -1;
+    end;
 
     writeln(ans);
 end.

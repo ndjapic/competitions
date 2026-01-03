@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="42"/>
+        <CursorPos Y="73"/>
+        <UsageCount Value="29"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="8">
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="35" Column="54" TopLine="7"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="49" Column="20" TopLine="21"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="23" Column="20" TopLine="8"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="47" TopLine="23"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="23" Column="5" TopLine="7"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="21" Column="4" TopLine="5"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="64" Column="46" TopLine="40"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="23" Column="17" TopLine="41"/>
+      </Position>
+      <Position>
+        <Filename Value="Sum_of_Goodness.pas"/>
+        <Caret Line="66" Column="43" TopLine="41"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode="default">
+        <Mode Name="default"/>
+      </Modes>
+    </RunParams>
+    <HistoryLists>
+      <List Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="/usr/bin/qterminal -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </List>
+    </HistoryLists>
+  </ProjectSession>
+</CONFIG>
