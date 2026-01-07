@@ -35,7 +35,7 @@ begin
 			b := n+1-k;
 			while b-a > 1 do begin
 				c := (a+b) div 2;
-				if max(0, c-(k-l)) + c <= m then
+				if max(1, c-(k-l)) + c <= m then
 					a := c
 				else
 					b := c;
