@@ -14,15 +14,19 @@ begin
 		k := min(k, n+1-k);
 
 		if k = 1 then
-			writeln(min(n, (m+1) div 2))
+			writeln(min(n, (m+1) div 2 + 1))
+		else if m <= 2 then
+			writeln(min(n, m+1))
 		else begin
-			{3*d-2 <= m}
+			{c+c-1+c <= m}
+			{3*c <= m+1}
+			{c <= (m+1) div 3}
 
 			a := 1;
-			b := k;
+			b := min(k, (m+1) div 3 + 1);
 			while b-a > 1 do begin
 				c := (a+b) div 2;
-				if 3*c-2 <= m then
+				if 3*c-1 <= m then
 					a := c
 				else
 					b := c;
@@ -32,16 +36,16 @@ begin
 			dec(m, 2*a-1);
 
 			a := 1;
-			b := n+1-k;
+			b := min(m+2, n-k+1);
 			while b-a > 1 do begin
 				c := (a+b) div 2;
-				if max(1, c-(k-l)) + c <= m then
+				if max(0, c-(k-l)) + c <= m then
 					a := c
 				else
 					b := c;
 			end;
 
-			r := k+c;
+			r := k+a;
 			writeln(r-l+1);
 
 		end;
