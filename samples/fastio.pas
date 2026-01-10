@@ -24,6 +24,8 @@ begin
 end;
 
 begin
+	// SetTextBuf(Input, BufIn); // где је BufIn: array[0..1 shl 16] of char
+	// Или једноставно користите {$Optimization ON} да бисте били сигурни да компајлер ради свој посао.
 	randomize;
 	sl := TStringList.Create;
 	sl.Delimiter := ' ';
