@@ -1,5 +1,5 @@
 program fastio;
-{$MODE DELPHI}{$INLINE ON}
+{$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
 	Generics.Defaults, Generics.Collections, sysutils, classes, math;
 const
@@ -17,6 +17,7 @@ var
 	ios, s: string;
 	Comparer: TIntComparer;
 	ans: array [0 .. nn] of int32;
+	InputBuf, OutputBuf: array [1..65535] of Char;
 
 function TIntComparer.Compare(constref L, R: int32): Integer;
 begin
@@ -24,8 +25,8 @@ begin
 end;
 
 begin
-	// SetTextBuf(Input, BufIn); // где је BufIn: array[0..1 shl 16] of char
-	// Или једноставно користите {$Optimization ON} да бисте били сигурни да компајлер ради свој посао.
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
 	randomize;
 	sl := TStringList.Create;
 	sl.Delimiter := ' ';
