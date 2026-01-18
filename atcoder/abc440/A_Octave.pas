@@ -1,4 +1,4 @@
-program B_Trifecta;
+program A;
 var
 	x, y: int32;
 

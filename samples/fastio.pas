@@ -17,7 +17,7 @@ var
 	ios, s: string;
 	Comparer: TIntComparer;
 	ans: array [0 .. nn] of int32;
-	InputBuf, OutputBuf: array [1..65535] of Char;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 function TIntComparer.Compare(constref L, R: int32): Integer;
 begin
