@@ -14,7 +14,7 @@ var
 	enu : TList<int32>.TEnumerator;
 	a: TList<int32>;
 	sl: TStringList;
-	ios, s: string;
+	ios, se: string;
 	Comparer: TIntComparer;
 	ans: array [0 .. nn] of int32;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
@@ -42,8 +42,8 @@ begin
 		sl.DelimitedText := ios;
 
 		a.Clear;
-		for s in sl do begin
-			a.Add(StrToInt(s));
+		for se in sl do begin
+			a.Add(StrToInt(se));
 			a.Exchange(a.Count - 1, random(a.Count));
 		end;
 		a.Sort(Comparer);
@@ -57,7 +57,7 @@ begin
 			end;
 
 		writeln(sl.DelimitedText);
-		flush(StdErr); flush(output); // DO NOT REMOVE
+		{flush(StdErr); flush(output);} // DO NOT REMOVE
 
 	end;
 
