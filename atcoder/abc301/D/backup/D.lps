@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="D.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Bitmask"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos Y="29"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="5">
+      <Position>
+        <Filename Value="D.pas"/>
+        <Caret Line="39" Column="17" TopLine="14"/>
+      </Position>
+      <Position>
+        <Filename Value="D.pas"/>
+        <Caret Line="51" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="D.pas"/>
+        <Caret Line="38" Column="37" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="D.pas"/>
+        <Caret Line="14"/>
+      </Position>
+      <Position>
+        <Filename Value="D.pas"/>
+        <Caret Line="4" Column="9"/>
+      </Position>
+      <Position>
+        <Filename Value="D.pas"/>
+        <Caret Line="5"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

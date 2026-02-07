@@ -1,0 +1,60 @@
+\documentclass[12pt]{beamer}
+\usetheme{Copenhagen}
+\usefonttheme[onlymath]{serif}
+\usepackage[OT2]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[serbian]{babel}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx,tikz}
+\author{Аутор}
+\title{Геометријске илустрације}
+%\setbeamercovered{transparent} 
+%\setbeamertemplate{navigation symbols}{} 
+%\logo{} 
+%\institute{} 
+%\date{} 
+%\subject{} 
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}
+%\tableofcontents
+%\end{frame}
+
+\begin{frame}{Ромб}
+Примена Питагорине теореме на ромб:
+$$
+	a^2 =
+	\left( \frac{d_1}{2} \right)^2 +
+	\left( \frac{d_2}{2} \right)^2
+$$
+\end{frame}
+
+\begin{frame}{Правоугли троугао}
+\begin{tikzpicture}
+  \coordinate (C) at (0,0);
+  \coordinate (A) at (4,0);
+  \coordinate (B) at (0,3);
+
+  \draw (A)
+  	-- (B) node[midway, above right] {$c = 5 \,\mathrm{cm}$}
+  	-- (C) node[midway, left] {$a = 3 \,\mathrm{cm}$}
+  	-- cycle node[midway, below] {$b = 4 \,\mathrm{cm}$};
+
+  \draw (A) circle (1pt) node[below right] {$A$};
+  \draw (B) circle (1pt) node[above left] {$B$};
+  \draw (C) circle (1pt) node[below left] {$C$};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Правоугаоник и кружница}
+\begin{tikzpicture}
+  \draw (0,0) circle (1cm);
+  \draw (3,0) rectangle (5,2);
+\end{tikzpicture}
+\end{frame}
+
+\end{document}

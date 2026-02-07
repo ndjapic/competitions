@@ -52,6 +52,7 @@ begin
             read(a[v]);
             adj[v] := 0;
         end;
+        readln;
 
         for v := 2 to n do begin
             read(u);

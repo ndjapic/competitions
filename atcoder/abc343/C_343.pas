@@ -1,0 +1,41 @@
+program C_343;
+var
+    n, x, xxx, ans: int64;
+    c: int8;
+    d: array [1 .. 18] of int8;
+
+function is_palindromic(x: int64): boolean;
+var
+    l, r: int8;
+begin
+    c := 0;
+    while x > 0 do begin
+        inc(c);
+        d[c] := x mod 10;
+        x := x div 10;
+    end;
+
+    l := 1;
+    r := c;
+    while (l <= r) and (d[l] = d[r]) do begin
+        inc(l);
+        dec(r);
+    end;
+    is_palindromic := l > r;
+end;
+
+begin
+    readln(n);
+
+    ans := 1;
+    x := 1;
+    xxx := x * x * x;
+
+    while xxx <= n do begin
+        if is_palindromic(xxx) then ans := xxx;
+        inc(x);
+        xxx := x * x * x;
+    end;
+
+    writeln(ans);
+end.

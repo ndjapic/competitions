@@ -3,12 +3,17 @@ uses
 	math;
 const
     maxn = 10;
-    maxs = 2000 * 1000;
+    maxs = 2000 * 1000 + 1;
 var
-    n, i, j: int8;
-    s: int32;
-    d, dx, dy: int64;
+    n, i: int8;
+    l, r, lx, ly, rx, ry: int32;
+    s: int64;
     q, a, b: array [1 .. 26] of int32;
+
+function f(i: int8; x, y: int64): int64;
+begin
+    f := x * a[i] + y * b[i];
+end;
 
 begin
     readln(n);
@@ -16,22 +21,55 @@ begin
     for i := 1 to n do read(a[i]); readln;
     for i := 1 to n do read(b[i]); readln;
 
-	s := maxs;
-	for i := 1 to n do begin
+	l := 0;
+	r := maxs;
 
-		{if (a[i] > 0) then s := min(s, q[i] div a[i]);
-		if (b[i] > 0) then s := min(s, q[i] div b[i]);}
+	while r-l > 1 do begin
 
-		for j := i+1 to n do begin
-			d := abs(int64(a[i]) * b[j] - int64(a[j]) * b[i]);
-			if d <> 0 then begin
-				dx := abs(int64(q[i]) * b[j] - int64(q[j]) * b[i]);
-				dy := abs(int64(a[i]) * q[j] - int64(a[j]) * q[i]);
-				s := min(s, dx div d + dy div d);
+		s := (l+r) div 2;
+		lx := 0;
+		rx := s;
+		ly := s;
+		ry := 0;
+
+        i := 1;
+        while (i <= n) and (lx <= rx) do begin
+
+            if min(f(i, lx, ly), f(i, rx, ry)) > q[i] then
+                lx := rx+1
+			else if f(i, lx, ly) > q[i] then begin
+
+                (* ax+by=q *)
+                (* x+y=s *)
+                (* a(s-y)+by=q *)
+                (* (b-a)y=q-as *)
+                (* y=(q-as)/(b-a) *)
+
+                ly := min(ly, (q[i] - s * a[i]) div (b[i] - a[i]));
+                lx := s - ly;
+
+			end else if f(i, rx, ry) > q[i] then begin
+
+                (* ax+by=q *)
+                (* x+y=s *)
+                (* ax+b(s-x)=q *)
+                (* (a-b)x=q-bs *)
+                (* x=(q-bs)/(a-b) *)
+
+                rx := min(rx, (q[i] - s * b[i]) div (a[i] - b[i]));
+                ry := s - rx;
+
 			end;
+
+            inc(i);
 		end;
+
+		if lx <= rx then
+			l := s
+		else
+			r := s;
 
 	end;
 
-	writeln(s);
+	writeln(l);
 end.

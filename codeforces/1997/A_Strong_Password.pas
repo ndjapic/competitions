@@ -1,10 +1,8 @@
-program A_Strong_Password;
+program A_Strong_Password_v2;
 {$mode objfpc}{$H+}{$J-}
-uses
-    math;
 var
     ntc, tci: int16;
-    n, i, j: int8;
+    n, i: int8;
     s: string;
 
 begin
@@ -12,18 +10,21 @@ begin
     for tci := 1 to ntc do begin
 
         readln(s);
+
         n := length(s);
+        setlength(s, n+1);
+        s[n+1] := s[n];
 
-		i := 2;
-		while (i <= n) and (s[i-1] <> s[i]) do inc(i);
+        i := n;
+        while (i > 1) and (s[i-1] <> s[i]) do begin
+            s[i] := s[i-1];
+            dec(i);
+        end;
 
-		setlength(s, n+1);
-		for j := n downto i do s[j+1] := s[j];
-
-		if s[i-1] = 'a' then
-			s[i] := 'b'
-		else
-			s[i] := 'a';
+        if s[i+1] = 'a' then
+            s[i] := 'b'
+        else
+            s[i] := 'a';
 
         writeln(s);
 

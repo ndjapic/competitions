@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="C.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="AtCoder_Cards"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="27"/>
+        <CursorPos X="28" Y="37"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="6">
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="41" TopLine="19"/>
+      </Position>
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="34" Column="25" TopLine="19"/>
+      </Position>
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="3"/>
+      </Position>
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="39" Column="17" TopLine="18"/>
+      </Position>
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="32" Column="44" TopLine="14"/>
+      </Position>
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="46" Column="7" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="C.lpr"/>
+        <Caret Line="37" Column="29" TopLine="27"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
