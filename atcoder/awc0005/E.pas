@@ -1,78 +1,56 @@
 program _E;
+{$OPTIMIZATION LEVEL3,ON}
 uses
-    math;
+	math;
 const
 	nn = 100 * 1000;
 	tt = 256 * 1024;
+	neutral = low(int32);
 var
 	n, q, i, l, r: int32;
 	a: array [1 .. nn] of int32;
-    st, lz: array [1 .. tt] of int32;
+	st: array [1 .. tt] of int32;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-procedure combine(v: int32);
+function combine(x, y: int32): int32; inline;
 begin
-    st[v] := max(st[2*v], st[2*v+1]);
-end;
-
-procedure push(v: int32);
-begin
-    inc(st[2*v], lz[v]);
-    inc(st[2*v+1], lz[v]);
-    inc(lz[2*v], lz[v]);
-    inc(lz[2*v+1], lz[v]);
-    lz[v] := 0;
+	combine := max(x, y);
 end;
 
 procedure build(v, l, r: int32);
 var
-    m: int32;
+	m: int32;
 begin
-    lz[v] := 0;
-    if l < r then begin
-        m := (l+r) div 2;
-        build(2*v, l, m);
-        build(2*v+1, m+1, r);
-        combine(v);
-    end else
-        st[v] := a[l];
-end;
-
-procedure update(v, vl, vr, l, r, d: int32);
-var
-    m: int32;
-begin
-    if (r < vl) or (vr < l) then
-    else if (l <= vl) and (vr <= r) then begin
-        inc(st[v], d);
-        inc(lz[v], d);
-    end else {if vl < vr then} begin
-        push(v);
-        m := (vl+vr) div 2;
-        update(2*v, vl, m, l, r, d);
-        update(2*v+1, m+1, vr, l, r, d);
-        combine(v);
-    end;
+	if l < r then begin
+		m := (l+r) div 2;
+		build(2*v, l, m);
+		build(2*v+1, m+1, r);
+		st[v] := combine(st[2*v], st[2*v+1]);
+	end else
+		st[v] := a[l];
 end;
 
 function query(v, vl, vr, l, r: int32): int32;
 var
-    m: int32;
+	m: int32;
 begin
-    if (r < vl) or (vr < l) then
-        query := low(int32)
-    else if (l <= vl) and (vr <= r) then
-        query := st[v]
-    else {if vl < vr then} begin
-        push(v);
-        m := (vl+vr) div 2;
-        query := max(
-            query(2*v, vl, m, l, r),
-            query(2*v+1, m+1, vr, l, r)
-        );
-    end;
+	if (r < vl) or (vr < l) then
+		query := neutral
+	else if (l <= vl) and (vr <= r) then
+		query := st[v]
+	else {if vl < vr then} begin
+		m := (vl+vr) div 2;
+		query := combine(
+			query(2*v, vl, m, l, r),
+			query(2*v+1, m+1, vr, l, r)
+		);
+	end;
 end;
 
 begin
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
+
 	readln(n, q);
 
 	for i := 1 to n do read(a[i]);
