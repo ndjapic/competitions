@@ -4,8 +4,11 @@ const
 var
 	n, m, k, i, j, c: int32;
 	s: array [1 .. nn] of int32;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
 	readln(n, m, k);
 
 	for i := 1 to n do read(s[i]);
