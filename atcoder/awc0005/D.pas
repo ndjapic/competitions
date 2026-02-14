@@ -6,8 +6,11 @@ var
 	l, r, m: int64;
 	a: array [1 .. nn] of int32;
 	s: array [0 .. nn] of int64;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
 	readln(n, k);
 
 	s[0] := 0;
