@@ -1,58 +1,39 @@
 program Program_Comparer;
-{$MODE DELPHI}
+{$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
-	Generics.Defaults, Generics.Collections;
-const
-	nn = 100 * 1000;
+	Generics.Defaults, Generics.Collections, Math;
 type
-	TIntComparer = class(TComparer<int32>)
-		function Compare(constref Left, Right: int32): Integer; override;
+	TBlock = record
+		h, w: int32;
 	end;
-var
-	n, i, ai: int32;
-	Comparer: TIntComparer;
-	a: TList<int32>;
 
-function TIntComparer.Compare(constref Left, Right: int32): Integer;
+function CompareBlocks(constref Left, Right: TBlock): Integer;
 begin
-	Result := Left - Right;
+	Result := - Sign(int64(Left.h * Left.w) - int64(Right.h * Right.w));
 end;
 
+var
+	n, i: int32;
+	b: TBlock;
+	blocks: TList<TBlock>;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
+
 begin
-	randomize;
-	Comparer := TIntComparer.Create;
-	Comparer._AddRef;
-	a := TList<int32>.Create;
-	try
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
 
-		n := nn div 10;
+	readln(n);
 
-		ai := 0;
-		for i := 0 to nn do begin
-			a.Add(ai);
-			a[i] := random(nn);
-			{read(a[i]);}
-			a.Exchange(i, random(i+1));
-		end;
-		{readln;}
+	blocks := TList<TBlock>.Create;
+	blocks.Capacity := n;
 
-		for i := 0 to 10 do write(' ', a[i*n]); writeln;
-
-		a.Sort(Comparer);
-		for i := 0 to 10 do write(' ', a[i*n]); writeln;
-		writeln(a.Count);
-
-	finally
-		a.Free;
-		{Comparer.Free;}
-		Comparer._Release;
+	for i := 1 to n do begin
+		ReadLn(b.h, b.w);
+		blocks.Add(b);
 	end;
-end.
-(*
- 54881 36678 74826 38613 39217 88120 75812 79091 36925 50366 30764
- 0 9857 19828 29869 39999 49890 59703 69823 79858 89858 99999
-100001
 
-=====
-Used: 78 ms, 44 KB
-*)
+	blocks.Sort(TComparer<TBlock>.Construct(CompareBlocks));
+
+	for i := 0 to blocks.Count - 1 do
+		Writeln(blocks[i].h, ' ', blocks[i].w);
+end.
