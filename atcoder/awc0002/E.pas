@@ -5,39 +5,64 @@ uses
 const
 	nn = 40;
 var
-	n, i: int8;
+	n, e, h: int8;
+	i, j, ans: int32;
 	x, s: int64;
-	a: TList<int64>;
-	pre: array [0 .. nn] of int64;
+	a: array [0 .. nn] of int64;
+	l, r: TList<int64>;
+	link: array of int32;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
-
-function dfs(i: int8; s: int64): int64;
-begin
-	if (i < 0) or (s < 0) or (s > pre[i]) then
-		dfs := 0
-	else if (s = 0) or (s = pre[i]) then
-		dfs := 1
-	else
-		dfs := dfs(i-1, s) + dfs(i-1, s-a[i-1]);
-end;
 
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
 
 	readln(n, s);
+	h := (n+1) div 2;
 
-	a := TList<int64>.Create;
-	for i := 1 to n do begin
-		read(x);
-		a.Add(x);
-	end;
+	for e := 0 to n-1 do read(a[e]);
 	readln;
-	a.Sort;
 
-	pre[0] := 0;
-	for i := 0 to n-1 do pre[i+1] := pre[i] + a[i];
+	l := TList<int64>.Create;
+	l.Add(0);
+	for e := 0 to h-1 do begin
+		i := l.Count - 1;
+		while i >= 0 do begin
+			x := l[i] + a[e];
+			if x <= s then l.Add(x);
+			dec(i);
+		end;
+	end;
+	l.Sort;
 
-	writeln(dfs(n, s));
-	a.Free;
+	r := TList<int64>.Create;
+	r.Add(0);
+	for e := h to n-1 do begin
+		j := r.Count - 1;
+		while j >= 0 do begin
+			x := r[j] + a[e];
+			if x <= s then r.Add(x);
+			dec(j);
+		end;
+	end;
+	r.Sort;
+
+	setlength(link, r.Count);
+	link[0] := -1;
+	for j := 1 to r.Count - 1 do
+		if r[j-1] < r[j] then
+			link[j] := j-1
+		else
+			link[j] := link[j-1];
+
+	ans := 0;
+	j := r.Count - 1;
+	for i := 0 to l.Count - 1 do begin
+		while (j >= 0) and (l[i] + r[j] > s) do j := link[j];
+		if (j >= 0) and (l[i] + r[j] = s) then inc(ans, j - link[j]);
+	end;
+
+	writeln(ans);
+	l.Free;
+	r.Free;
 end.
