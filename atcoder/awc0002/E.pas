@@ -6,8 +6,8 @@ const
 	nn = 40;
 var
 	n, e, h: int8;
-	i, j, ans: int32;
-	x, s: int64;
+	i, j: int32;
+	x, s, ans: int64;
 	a: array [0 .. nn] of int64;
 	l, r: TList<int64>;
 	link: array of int32;
