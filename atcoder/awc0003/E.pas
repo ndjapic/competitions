@@ -2,25 +2,34 @@ program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
 	Generics.Collections, Generics.Defaults;
-
+const
+	nn = 16;
 var
 	n, m, i: Int8;
-	w, c: TList<Int32>;
 	x: int32;
+	w, c: TList<Int32>;
+	c0: array [0 .. nn] of int32;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 function dfs(i: int8): boolean;
 var
-	l, r: int8;
+	l, r, h: int8;
 begin
-	if i < 0 then
-		result := True
-	else begin
+	result := i < 0;
+	if not result then begin
 
-		result := False;
-		r := m;
-		while not result and (c[r] >= w[i]) do begin
-			if (c[r] > c[r-1]) then begin
+		l := 0;
+		r := m+1;
+		while r-l > 1 do begin
+			h := (r+l) div 2;
+			if c[h] >= w[i] then
+				r := h
+			else
+				l := h;
+		end;
+
+		while not result and (r <= m) do begin
+			if c[r] > c[r-1] then begin
 
 				c[r] := c[r] - w[i];
 				l := r;
@@ -37,8 +46,15 @@ begin
 				end;
 				c[r] := c[r] + w[i];
 
+				if not result then begin
+					if c[r] = w[i] then
+						r := m+1
+					else if c[r] = c0[r] then
+						while (r < m) and (c0[r] = c0[r+1]) do inc(r);
+				end;
+
 			end;
-			dec(r);
+			inc(r);
 		end;
 
 	end;
@@ -64,6 +80,7 @@ begin
 		c.Add(x);
 	end;
 	c.Sort;
+	for i := 0 to m do c0[i] := c[i];
 
 	if dfs(n-1) then
 		writeln('Yes')
