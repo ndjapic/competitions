@@ -1,7 +1,7 @@
 program fastio;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
-	Generics.Defaults, Generics.Collections, sysutils, classes, math;
+	Generics.Defaults, Generics.Collections, SysUtils, Classes, Math;
 const
 	nn = 200 * 1000;
 type
