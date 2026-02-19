@@ -3,9 +3,9 @@ program _D;
 uses
 	Generics.Defaults, Generics.Collections, Math;
 type
-	TGuard = record
+	{TGuard = record
 		l, r: int32;
-	end;
+	end;}
 	THeapComparer<_T> = class
 		class function Compare(constref Left, Right: _T): SizeInt;
 	end;
@@ -27,20 +27,20 @@ type
 var
 	n, m, i, x, c: int32;
 	g: TGuard;
-	guards: TList<TGuard>;
+	guards: array [1 .. nn] of int32;
 	pq: THeap<int32, THeapComparer<int32>>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function CompareGuards(constref Left, Right: TGuard): Integer;
+{function CompareGuards(constref Left, Right: TGuard): Integer;
 begin
 	Result := Sign(Left.l - Right.l);
 	if Result = 0 then Result := Sign(Left.r - Right.r);
-end;
+end;}
 
 // THeapComparer<_T>
 class function THeapComparer<_T>.Compare(constref Left, Right: _T): SizeInt;
 begin
-	Result := Left - Right;
+	Result := - Left + Right;
 end;
 
 // THeap<_T, _C>
@@ -115,27 +115,30 @@ begin
 
 	readln(n, m);
 
-	guards := TList<TGuard>.Create;
-	guards.Capacity := m;
+	for l := 1 to n do guards[l] := 0;
+	{guards.Capacity := m;}
 
-	for i := 0 to m-1 do begin
-		ReadLn(g.l, g.r);
-		guards.Add(g);
+	for i := 1 to m do begin
+		ReadLn(l, r);
+		guards[l] := max(guards[l], r);
 	end;
 
-	guards.Sort(TComparer<TGuard>.Construct(CompareGuards));
+	{guards.Sort(TComparer<int32>.Construct(CompareGuards));}
 	c := 0;
 	x := 1;
 	i := 0;
 	pq := THeap<int32, THeapComparer<int32>>.Create;
 
-	while (i < m) and (guards[i].l <= x) do begin
-		x := max(x, guards[i].r + 1);
-		inc(i);
+	while (l <= n) and (l <= r+1) do begin
+		if mx < guards
+		r := max(r, guards[l]);
+		if l > x then begin
+		inc(l);
 	end;
 
 	if x <= n then c:= -1;
 	writeln(c);
-	guards.Free;
+
+	for l := 1 to n do guards[l].Free;
 	pq.Free;
 end.
