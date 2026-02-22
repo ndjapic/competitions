@@ -21,7 +21,7 @@ begin
 	j := m;
 	for k := l to r-1 do
 		if (j = r) or (i < m) and (
-			compare(h[i], h[j]) < 0
+			compare(h[i], h[j]) <= 0
 		) then begin
 			h2[k] := h[i];
 			inc(i);
