@@ -1,11 +1,12 @@
-program _C;
+program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
-	Generics.Collections;
+	math;
 const
 	nn = 200;
 var
-	i, j, k, m, n, l, r: int32;
+	j, k, m, n, l, r: int32;
+	d, ans: int64;
 	a, b: array [1 .. nn] of int32;
 	dp: array [0 .. nn, 0 .. nn] of int64;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
@@ -18,14 +19,17 @@ begin
 
 	for j := 0 to m do dp[0, j] := 0;
 
+	ans := 0;
 	for r := 1 to n do begin
 		readln(a[r], b[r]);
+		d := a[r] - b[r];
 		for j := b[r] to m do begin
-			mx := -n*m;
+			dp[r, j] := 0;
 			for l := max(0, r-k) to r-1 do
-				mx := max(mx, dp[l, j-b[r]]);
-			dp[r, j] := mx + a[r] - b[r];
+				dp[r, j] := max(dp[r, j], dp[l, j-b[r]] + d);
+			ans := max(ans, dp[r, j]);
 		end;
 	end;
 
+	writeln(ans);
 end.
