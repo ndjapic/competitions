@@ -6,7 +6,7 @@ const
 	nn = 200;
 var
 	j, k, m, n, l, r: int32;
-	d, ans: int64;
+	ans: int64;
 	a, b: array [1 .. nn] of int32;
 	dp: array [0 .. nn, 0 .. nn] of int64;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
@@ -22,11 +22,10 @@ begin
 	ans := 0;
 	for r := 1 to n do begin
 		readln(a[r], b[r]);
-		d := a[r] - b[r];
 		for j := b[r] to m do begin
 			dp[r, j] := 0;
 			for l := max(0, r-k) to r-1 do
-				dp[r, j] := max(dp[r, j], dp[l, j-b[r]] + d);
+				dp[r, j] := max(dp[r, j], dp[l, j-b[r]] + a[r]);
 			ans := max(ans, dp[r, j]);
 		end;
 	end;
