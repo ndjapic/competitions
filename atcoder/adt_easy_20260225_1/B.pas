@@ -3,7 +3,7 @@ program _B;
 const
 	nn = 200 * 1000;
 var
-	d, f: int32;
+	d, f, weeks, ans: int32;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
@@ -11,7 +11,8 @@ begin
 	SetTextBuf(Output, OutputBuf);
 
 	readln(d, f);
-	while f <= d do inc(f, 7);
-	writeln(f-d);
+	weeks := (d-f) div 7 + 1;
+	ans := f + 7 * weeks - d;
+	writeln(ans);
 
 end.
