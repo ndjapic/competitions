@@ -118,22 +118,6 @@ begin
 	end;
 end;
 
-function FastReadInt: Int32;
-var
-	ch: Char;
-begin
-	Result := 0;
-	repeat
-		read(ch);
-	until ch in ['0'..'9', '-']; // прескочи размаке и крај реда
-
-	while ch in ['0'..'9'] do begin
-		Result := Result * 10 + (ord(ch) - ord('0'));
-		if eof then break;
-		read(ch);
-	end;
-end;
-
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
@@ -143,7 +127,7 @@ begin
 	for a := 1 to n do adj[a] := tlist<troad>.create;
 
 	for i := 1 to m do begin
-		readln(a, b, c);
+		read(a, b, c); 
 		adj[a].add(road(b, c));
 		adj[b].add(road(a, c));
 	end;
