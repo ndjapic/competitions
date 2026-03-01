@@ -24,6 +24,22 @@ begin
 	Result := L - R;
 end;
 
+function FastReadInt: Int64;
+var
+	ch: Char;
+begin
+	Result := 0;
+	repeat
+		read(ch);
+	until ch in ['0'..'9', '-']; // прескочи размаке и крај реда
+
+	while ch in ['0'..'9'] do begin
+		Result := Result * 10 + (ord(ch) - ord('0'));
+		if eof then break;
+		read(ch);
+	end;
+end;
+
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
