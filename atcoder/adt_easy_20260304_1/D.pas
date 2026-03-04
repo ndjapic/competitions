@@ -1,7 +1,5 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-const
-	nn = 100;
 var
 	a, b: int64;
 	c: int8;
