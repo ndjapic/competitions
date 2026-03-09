@@ -1,4 +1,6 @@
 program isqrt;
+uses
+	math;
 
 function isqrt(a: int64): int64;
 var
