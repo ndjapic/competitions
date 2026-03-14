@@ -3,21 +3,21 @@ program _C;
 uses
 	math;
 const
-	hh = 10;
+	nn = 100;
 type
 	tcell = record
 		i, j: int8;
 	end;
 var
-	h, w, i, d, x, ans: int8;
-	c: tcell;
-	s: array [1 .. hh] of string;
-	hum: array [1 .. 2] of tcell;
+	h, w, n, i, j, k, h1, h2, c, d, ans: int8;
+	s: string;
+	floor_cells: array [1 .. nn] of tcell;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function dist(c1, c2: tcell): int8;
+function dist(k1, k2: int8): int8;
 begin
-	dist := abs(c1.i - c2.i) + abs(c1.j - c2.j);
+	dist := abs(floor_cells[k1].i - floor_cells[k2].i)
+		+ abs(floor_cells[k1].j - floor_cells[k2].j);
 end;
 
 begin
@@ -26,48 +26,25 @@ begin
 
 	readln(h, w, d);
 
-	for i := 1 to h do readln(s[i]);
+	n := 0;
+	for i := 1 to h do begin
+		readln(s);
+		for j := 1 to w do
+			if s[j] = '.' then begin
+				inc(n);
+				floor_cells[n].i := i;
+				floor_cells[n].j := j;
+			end;
+	end;
 
 	ans := 0;
-	hum[1].i := 1;
-	while hum[1].i <= h do begin
-		hum[1].j := 1;
-		while hum[1].j <= w do begin
-			if s[hum[1].i][hum[1].j] = '.' then begin
-
-				hum[2].i := 1;
-				while hum[2].i <= h do begin
-					hum[2].j := 1;
-					while hum[2].j <= w do begin
-						if s[hum[2].i][hum[2].j] = '.' then begin
-
-							x := 0;
-							c.i := 1;
-							while c.i <= h do begin
-								c.j := 1;
-								while c.j <= w do begin
-									if s[c.i][c.j] = '.' then begin
-
-										if min(dist(c, hum[1]), dist(c, hum[2])) <= d then inc(x);
-
-									end;
-									inc(c.j);
-								end;
-								inc(c.i);
-							end;
-							ans := max(ans, x);
-
-						end;
-						inc(hum[2].j);
-					end;
-					inc(hum[2].i);
-				end;
-
-			end;
-			inc(hum[1].j);
+	for h1 := 1 to n-1 do
+		for h2 := h1+1 to n do begin
+			c := 0;
+			for k := 1 to n do
+				if (dist(k, h1) <= d) or (dist(k, h2) <= d) then inc(c);
+			ans := max(ans, c);
 		end;
-		inc(hum[1].i);
-	end;
 
 	writeln(ans);
 end.
