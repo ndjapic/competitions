@@ -36,4 +36,6 @@ begin
 
 	for i := 0 to blocks.Count - 1 do
 		Writeln(blocks[i].h, ' ', blocks[i].w);
+
+	blocks.Free;
 end.
