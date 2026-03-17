@@ -36,15 +36,13 @@ begin
 		if (L mod 2 = 1) then begin
 			rmxq := max(rmxq, mx[L]);
 			rmnq := min(rmnq, mn[L]);
-			inc(L);
 		end;
 		if (R mod 2 = 0) then begin
 			rmxq := max(rmxq, mx[R]);
 			rmnq := min(rmnq, mn[R]);
-			dec(R);
 		end;
-		L := L div 2;
-		R := R div 2;
+		L := (L+1) div 2;
+		R := (R-1) div 2;
 	end;
 	query := rmxq - rmnq;
 end;
