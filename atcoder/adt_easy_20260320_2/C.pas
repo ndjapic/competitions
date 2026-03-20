@@ -1,225 +1,190 @@
 program _C;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-uses
-    math;
 
 type
-    TAVLTree<_T> = class
-        x: _T;
-        elementCount, treeSize: int32;
-        h: int8;
-        l, r: TAVLTree<_T>;
-        class function Compare(lhs, rhs: _T): SizeInt; inline;
-        constructor Create(x: _T);
+    TSortedTreap<_T> = class
+        Left, Right: TSortedTreap<_T>;
+        Key: _T;
+        Priority: Integer;
+        Size: Integer;
+        class function Compare(lhs, rhs: _T): Int32; inline; static;
+        class function GetSize(Other: TSortedTreap<_T>): Integer; inline; static;
+        procedure Update; inline;
+        constructor Create(K: _T);
         destructor Destroy; override;
-        class function GetTreeSize(t: TAVLTree<_T>): int32; inline;
-        class function GetHeight(t: TAVLTree<_T>): int8;
-        function GetBalance(): int8; inline;
-        class function GetElementCount(t: TAVLTree<_T>; x: _T): int32;
-        procedure UpdateNode(); inline;
-        class procedure RotateL(var t: TAVLTree<_T>); inline;
-        class procedure RotateR(var t: TAVLTree<_T>); inline;
-        class procedure Add(var t: TAVLTree<_T>; x: _T);
-        class procedure Discard(var t: TAVLTree<_T>; x: _T);
-        class procedure GetAt(t: TAVLTree<_T>; i: int32; var x: _T);
-        class function GetRank(t: TAVLTree<_T>; x: _T): int32;
+        procedure Split(K: _T; var L, R: TSortedTreap<_T>);
+        class function Merge(var L, R: TSortedTreap<_T>): TSortedTreap<_T>; static;
+        function Rank(K: _T): Integer;
+        procedure SplitByRank(i: Integer; var L, R: TSortedTreap<_T>);
+        class procedure Insort(var M: TSortedTreap<_T>; K: _T); static;
+        class procedure Discard(var M: TSortedTreap<_T>; K: _T); static;
+        procedure dfs;
+        function GetAt(i: Integer): _T;
+        property At[i: Integer]: _T Read GetAt; default;
     end;
 
-class function TAVLTree<_T>.Compare(lhs, rhs: _T): SizeInt;
+(* BEGIN TSortedTreap *)
+
+class function TSortedTreap<_T>.Compare(lhs, rhs: _T): Int32;
 begin
     Result := lhs - rhs;
 end;
 
-constructor TAVLTree<_T>.Create(x: _T);
+class function TSortedTreap<_T>.GetSize(Other: TSortedTreap<_T>): Integer;
 begin
-    Self.x := x;
-    elementCount := 1;
-    treeSize := 1;
-    h := 1;
-    l := nil;
-    r := nil;
-end;
-
-destructor TAVLTree<_T>.Destroy;
-begin
-    if l <> nil then l.Free;
-    if r <> nil then r.Free;
-    inherited;
-end;
-
-class function TAVLTree<_T>.GetTreeSize(t: TAVLTree<_T>): int32;
-begin
-    if t = nil then
+    if Other = nil then
         Result := 0
     else
-        Result := t.treeSize;
+        Result := Other.Size;
 end;
 
-class function TAVLTree<_T>.GetHeight(t: TAVLTree<_T>): int8;
+procedure TSortedTreap<_T>.Update;
 begin
-    if t = nil then
-        Result := 0
-    else
-        Result := t.h;
+    Size := GetSize(Left) + 1 + GetSize(Right);
 end;
 
-function TAVLTree<_T>.GetBalance(): int8;
+constructor TSortedTreap<_T>.Create(K: _T);
 begin
-    {if Self = nil then
-        Result := 0
-    else}
-        Result := GetHeight(r) - GetHeight(l);
+    Inherited Create;
+    Key := K;
+    Priority := Random(High(Integer));
+    Size := 1;
+    Left := nil;
+    Right := nil;
 end;
 
-class function TAVLTree<_T>.GetElementCount(t: TAVLTree<_T>; x: _T): int32;
+destructor TSortedTreap<_T>.Destroy;
 begin
-    if t = nil then
-        Result := 0
-    else if Compare(x, t.x) < 0 then
-        Result := GetElementCount(t.l, x)
-    else if Compare(x, t.x) > 0 then
-        Result := GetElementCount(t.r, x)
-    else
-        Result := t.elementCount;
+    if Left <> nil then Left.Free;
+    if Right <> nil then Right.Free;
+    Inherited;
+    Self := nil;
 end;
 
-procedure TAVLTree<_T>.UpdateNode();
+procedure TSortedTreap<_T>.Split(K: _T; var L, R: TSortedTreap<_T>);
 begin
-    treeSize := GetTreeSize(l) + GetTreeSize(r) + elementCount;
-    h := max(GetHeight(l), GetHeight(r)) + 1;
-end;
-
-class procedure TAVLTree<_T>.RotateL(var t: TAVLTree<_T>);
-var
-    r: TAVLTree<_T>;
-begin
-    r := t.r;
-    t.r := r.l;
-    r.l := t;
-    t.UpdateNode();
-    {r.UpdateNode(); Is this neccessary? There will be update after this.}
-    t := r;
-end;
-
-class procedure TAVLTree<_T>.RotateR(var t: TAVLTree<_T>);
-var
-    l: TAVLTree<_T>;
-begin
-    l := t.l;
-    t.l := l.r;
-    l.r := t;
-    t.UpdateNode();
-    {l.UpdateNode(); Is this neccessary? There will be update after this.}
-    t := l;
-end;
-
-class procedure TAVLTree<_T>.Add(var t: TAVLTree<_T>; x: _T);
-begin
-    if t = nil then
-        t := TAVLTree<int32>.Create(x)
-    else if Compare(x, t.x) < 0 then begin
-
-        Add(t.l, x);
-        if t.GetBalance() < -1 then begin
-            if t.l.GetBalance() > 0 then RotateL(t.l);
-            RotateR(t);
-        end;
-
-    end else if Compare(x, t.x) > 0 then begin
-
-        Add(t.r, x);
-        if t.GetBalance() > 1 then begin
-            if t.r.GetBalance() < 0 then RotateR(t.r);
-            RotateL(t);
-        end;
-
-    end else
-        inc(t.elementCount);
-
-    t.UpdateNode();
-end;
-
-class procedure TAVLTree<_T>.Discard(var t: TAVLTree<_T>; x: _T);
-var
-    temp: TAVLTree<_T>;
-begin
-    if t <> nil then begin
-        if Compare(x, t.x) < 0 then
-            Discard(t.l, x)
-        else if Compare(x, t.x) > 0 then
-            Discard(t.r, x)
-        else if t.elementCount > 1 then
-            dec(t.elementCount)
-        else if t.l = nil then begin
-            temp := t;
-            t := t.r;
-            temp.r := nil; // Prevent recursive Destroy
-            temp.Free;
-        end else if t.r = nil then begin
-            temp := t;
-            t := t.l;
-            temp.l := nil; // Prevent recursive Destroy
-            temp.Free;
-        end else begin // Чвор са два потомка
-            if GetHeight(t.l) > GetHeight(t.r) then begin
-                RotateR(t);
-                Discard(t.r, x);
-            end else begin
-                RotateL(t);
-                Discard(t.l, x);
-            end;
-            Exit; // Након ротације и рекурзивног брисања, балансирање ће се обавити при повратку
-        end;
-
-        if t <> nil then begin
-            t.UpdateNode();
-            if t.GetBalance() < -1 then begin
-                if (t.l <> nil) and (t.l.GetBalance() > 0) then RotateL(t.l);
-                RotateR(t);
-                t.UpdateNode(); // Re-update after rotation
-            end else if t.GetBalance() > 1 then begin
-                if (t.r <> nil) and (t.r.GetBalance() < 0) then RotateR(t.r);
-                RotateL(t);
-                t.UpdateNode(); // Re-update after rotation
-            end;
-        end;
-    end;
-end;
-
-class procedure TAVLTree<_T>.GetAt(t: TAVLTree<_T>; i: int32; var x: _T);
-var
-    leftSize: int32;
-begin
-    if t <> nil then begin
-        leftSize := GetTreeSize(t.l);
-        if i < leftSize then
-            GetAt(t.l, i, x)
-        else if i < leftSize + t.elementCount then
-            x := t.x
+    if Compare(Key, K) < 0 then begin
+        if Right = nil then
+            R := nil
         else
-            GetAt(t.r, i - leftSize - t.elementCount, x);
+            Right.Split(K, Right, R);
+        L := Self;
+    end else begin
+        if Left = nil then
+            L := nil
+        else
+            Left.Split(K, L, Left);
+        R := Self;
+    end;
+    Update;
+end;
+
+class function TSortedTreap<_T>.Merge(var L, R: TSortedTreap<_T>): TSortedTreap<_T>;
+begin
+    if (L = nil) or (R <> nil) and (L.Priority < R.Priority) then begin
+        if R <> nil then begin
+            R.Left := Merge(L, R.Left);
+            R.Update;
+        end;
+        Result := R;
+    end else begin
+        L.Right := Merge(L.Right, R);
+        L.Update;
+        Result := L;
     end;
 end;
 
-class function TAVLTree<_T>.GetRank(t: TAVLTree<_T>; x: _T): int32;
+function TSortedTreap<_T>.Rank(K: _T): Integer;
+var
+    L, R: TSortedTreap<_T>;
 begin
-    Result := 0;
-    while t <> nil do begin
-        if Compare(x, t.x) < 0 then
-            t := t.l
-        else if Compare(x, t.x) > 0 then begin
-            Result := Result + GetTreeSize(t.l) + t.elementCount;
-            t := t.r;
-        end else begin
-            Result := Result + GetTreeSize(t.l);
-            Exit;
-        end;
+    Split(K, L, R);
+    Result := GetSize(L);
+    Self := Merge(L, R);
+end;
+
+procedure TSortedTreap<_T>.SplitByRank(i: Integer; var L, R: TSortedTreap<_T>);
+var
+    j: Integer;
+begin
+    j := i - GetSize(Left) - 1;
+    if j < 0 then begin
+        if Left = nil then
+            L := nil
+        else
+            Left.SplitByRank(i, L, Left);
+        R := Self;
+    end else begin
+        if Right = nil then
+            R := nil
+        else
+            Right.SplitByRank(j, Right, R);
+        L := Self;
+    end;
+    Update;
+end;
+
+class procedure TSortedTreap<_T>.Insort(var M: TSortedTreap<_T>; K: _T);
+var
+    L, R: TSortedTreap<_T>;
+begin
+    if M = nil then begin
+        M := TSortedTreap<_T>.Create(K);
+    end else begin
+        M.Split(K, L, R);
+        M := TSortedTreap<_T>.Create(K);
+        M := Merge(L, M);
+        M := Merge(M, R);
     end;
 end;
+
+class procedure TSortedTreap<_T>.Discard(var M: TSortedTreap<_T>; K: _T);
+var
+    L, R: TSortedTreap<_T>;
+begin
+    M.Split(K, L, R);
+
+    if R <> nil then begin
+        R.SplitByRank(1, M, R);
+        if Compare(M.Key, K) = 0 then begin
+            M.Free;
+            M := nil;
+        end else if R = nil then
+            R := M
+        else
+            R := Merge(M, R);
+    end;
+
+    M := Merge(L, R);
+end;
+
+function TSortedTreap<_T>.GetAt(i: Integer): _T;
+var
+    j: Integer;
+begin
+    j := i - GetSize(Left) - 1;
+    if (j < -1) {and (Left <> nil)} then
+        Result := Left.GetAt(i)
+    else if (j > -1) {and (Right <> nil)} then
+        Result := Right.GetAt(j)
+    else
+        Result := Key;
+end;
+
+procedure TSortedTreap<_T>.dfs;
+begin
+    write('[');
+    if Left <> nil then Left.dfs;
+    write(Key);
+    if Right <> nil then Right.dfs;
+    write(']');
+end;
+
+(* END TSortedTreap *)
 
 var
-    n, m, i, x: int32;
-    t: TAVLTree<int32>;
+	n, m, i, x: int32;
+	a: TSortedTreap<Int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
@@ -227,28 +192,24 @@ begin
 	SetTextBuf(Output, OutputBuf);
 
 	readln(n, m);
-    t := nil;
+	a := nil;
 
 	for i := 1 to n do begin
 		read(x);
-		TAVLTree<int32>.Add(t, x);
+		TSortedTreap<Int32>.Insort(a, x);
 	end;
 	readln;
 
 	for i := 1 to m do begin
 		read(x);
-		TAVLTree<int32>.Discard(t, x)
+		if a <> nil then
+			TSortedTreap<Int32>.Discard(a, x);
 	end;
 	readln;
 
-	if t <> nil then begin
-		for i := 0 to t.treeSize - 2 do begin
-			TAVLTree<int32>.GetAt(t, i, x);
-			write(x, ' ');
-		end;
-		TAVLTree<int32>.GetAt(t, t.treeSize - 1, x);
-		writeln(x);
+	if a <> nil then begin
+		for i := 0 to a.Size - 2 do write(a[i], ' ');
+		writeln(a[a.Size - 1]);
+		a.Free;
 	end;
-
-	t.Free;
 end.
