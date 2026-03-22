@@ -1,7 +1,5 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-uses
-	math;
 const
 	nn = 200 * 1000;
 var
