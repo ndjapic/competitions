@@ -1,15 +1,14 @@
 from collections import Counter
 
 s = input()
-if len(s) % 2 == 1:
+h, m = divmod(len(s), 2)
+c = Counter(s)
+
+if m % 2 == 1:
+	print('No')
+elif any(s[2*i] != s[2*i+1] for i in range(h)):
+	print('No')
+elif any(c[x] != 2 for x in c.keys()):
 	print('No')
 else:
-	h = len(s) // 2
-	if any(s[i] != s[2*i] for i in range(h)):
-		print('No')
-	else:
-		c = Counter(s)
-		if any(c[x] != 2 for x in c.keys()):
-			print('No')
-		else:
-			print('Yes')
+	print('Yes')
