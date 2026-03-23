@@ -5,7 +5,6 @@ uses
 var
 	n, m, i, j, elm: int32;
 	s: int64;
-	ans: boolean;
 	l, r: TList<int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
@@ -31,17 +30,16 @@ begin
 	readln;
 	r.Sort;
 
-	ans := true;
 	s := 0;
+	i := 0;
 	j := m-1;
-	for i := 0 to n-1 do
-		if ans then begin
-			while (j >= 0) and (n-r[j] <= i) do dec(j);
-			inc(s, j+1-m+l[i]);
-			ans := s >= 0;
-		end;
+	while (i < n) and (s >= 0) do begin
+		while (j >= 0) and (n - r[j] <= i) do dec(j);
+		inc(s, j+1 -m+l[i]);
+		inc(i);
+	end;
 
-	if ans then begin
+	if s >= 0 then begin
 		writeln('Yes');
 	end else
 		writeln('No');
