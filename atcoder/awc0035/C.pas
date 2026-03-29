@@ -1,8 +1,7 @@
 program _C;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
-	Generics.Collections,
-	Generics.Defaults;
+	Generics.Collections;
 const
 	nn = 200 * 1000;
 var
@@ -44,9 +43,11 @@ begin
 			end;
 		inc(i);
 	end;
-	blackout.Sort;
 
 	if blackout.Count > 0 then begin
+		blackout.Clear;
+		for v := 1 to n do
+			if t[v] < 0 then blackout.Add(v);
 		for i := 0 to blackout.Count - 2 do
 			write(blackout[i], ' ');
 		writeln(blackout[blackout.Count - 1]);
