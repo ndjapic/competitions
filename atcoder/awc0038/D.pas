@@ -4,8 +4,8 @@ const
 	nn = 500 * 1000;
 	prime = 998244353;
 var
-	n, i, w: int32;
-	s, t: int64;
+	n, i, w, t: int32;
+	s: int64;
 	fact, invf: array [0 .. nn] of int32;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
@@ -29,6 +29,12 @@ begin
 	ncr := modmul(modmul(invf[r], invf[n-r]), fact[n]);
 end;
 
+procedure modinc(var a: int32; b: int32);
+begin
+	inc(a, b);
+	if a >= prime then dec(a, prime);
+end;
+
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
@@ -40,10 +46,11 @@ begin
 
 	readln(n);
 
-	t := 0;
-	for i := n div 2 to n-1 do
-		inc(t, ncr(n-1, i));
-	t := t mod prime;
+	t := modpow(2, n-1);
+	if odd(n) then
+		modinc(t, ncr(n-1, n div 2));
+	if odd(t) then inc(t, prime);
+	t := t div 2;
 
 	s := 0;
 	for i := 1 to n do begin
