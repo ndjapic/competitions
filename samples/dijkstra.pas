@@ -4,52 +4,51 @@ program dijkstra;
 * It is possible that the graph has loops
 * and multiple edges between pair of vertices.
 *)
-{$mode objfpc}
+{$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 const
 	nn = 100 * 1000;
 	inf = 1000 * 1000 * 1000 * 1000 * 1000 * 1000;
 
 type
-	generic TPrioQueue<T> = class
+	TPrioQueue<_T> = class
 	public
-		items: array [1 .. nn] of T;
+		items: array [1 .. nn] of _T;
 		inv: array [1 .. nn] of int32;
 		n: int32;
 		constructor Create();
-		function prior(l, r: T): boolean;
-		procedure setItem(v: int32; x: T);
-		procedure swim(v: int32; x: T);
-		procedure enqueue(x: T);
-		procedure sink(u: int32; x: T);
+		function prior(l, r: _T): boolean;
+		procedure setItem(v: int32; x: _T);
+		procedure swim(v: int32; x: _T);
+		procedure enqueue(x: _T);
+		procedure sink(u: int32; x: _T);
 		procedure dequeue(u: int32);
 	end;
-	TPrioQueue32 = specialize TPrioQueue<int32>;
 
 var
 	n, m, i, u, v, s, t, k: int32;
 	adj, par, wei, rev: array [1 .. nn] of int32;
 	d: array [1 .. nn] of int64;
 	sib, tar: array [-nn .. nn] of int32;
-	pq: TPrioQueue32;
+	pq: TPrioQueue<int32>;
 
-constructor TPrioQueue.Create();
+constructor TPrioQueue<_T>.Create();
 begin
 	{setlength(items, 1);}
 	n := 0;
 end;
 
-function TPrioQueue.prior(l, r: T): boolean;
+function TPrioQueue<_T>.prior(l, r: _T): boolean;
 begin
 	prior := d[l] < d[r];
 end;
 
-procedure TPrioQueue.setItem(v: int32; x: T);
+procedure TPrioQueue<_T>.setItem(v: int32; x: _T);
 begin
 	items[v] := x;
 	inv[x] := v;
 end;
 
-procedure TPrioQueue.swim(v: int32; x: T);
+procedure TPrioQueue<_T>.swim(v: int32; x: _T);
 var
 	u: int32;
 begin
@@ -62,14 +61,14 @@ begin
 	setItem(v, x);
 end;
 
-procedure TPrioQueue.enqueue(x: T);
+procedure TPrioQueue<_T>.enqueue(x: _T);
 begin
 	inc(n);
 	{if length(items) <= n then setlength(items, 2*n);}
 	swim(n, x);
 end;
 
-procedure TPrioQueue.sink(u: int32; x: T);
+procedure TPrioQueue<_T>.sink(u: int32; x: _T);
 var
 	v: int32;
 begin
@@ -84,7 +83,7 @@ begin
 	setItem(u, x);
 end;
 
-procedure TPrioQueue.dequeue(u: int32);
+procedure TPrioQueue<_T>.dequeue(u: int32);
 begin
 	dec(n);
 	sink(u, items[n+1]);
@@ -117,7 +116,7 @@ begin
 	for v := 1 to n do d[v] := inf;
 	s := 1;
 	d[s] := 0;
-	pq := TPrioQueue32.Create();
+	pq := TPrioQueue<int32>.Create();
 	for v := 1 to n do pq.enqueue(v);
 
 	while pq.n > 0 do begin
@@ -151,4 +150,5 @@ begin
 		rev[1] := -1;
 
 	writeln(rev[1]);
+	pq.Free;
 end.
