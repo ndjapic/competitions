@@ -3,15 +3,16 @@ program _C;
 const
 	prime = 998244353;
 var
-	n, d, i, j, p, s, w, sw, r: int64;
+	n, d, i, j, p, w, r: int32;
+	s, sw: int64;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function modmul(a, b: int64): int64;
+function modmul(a, b: int32): int32;
 begin
 	modmul := int64(a) * b mod prime;
 end;
 
-function modpow(b, e: int64): int64;
+function modpow(b, e: int32): int32;
 begin
 	if e = 0 then
 		modpow := 1
@@ -32,7 +33,7 @@ begin
 	for i := 1 to n do begin
 		read(p);
 		inc(s, p);
-		r := modmul(r, p mod prime);
+		r := modmul(r, p);
 	end;
 	s := s mod prime;
 	readln;
