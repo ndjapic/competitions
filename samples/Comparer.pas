@@ -12,6 +12,22 @@ begin
 	Result := - Sign(int64(Left.h * Left.w) - int64(Right.h * Right.w));
 end;
 
+function ReadAndSort(n: int32): TList<TBlock>;
+var
+	i: int32;
+	b: TBlock;
+begin
+	Result := TList<TBlock>.Create;
+	Result.Capacity := n;
+	for i := 0 to n-1 do begin
+		ReadLn(b.h, b.w);
+		Result.Add(b);
+		Result.Exchange(i, Random(i+1));
+	end;
+	{ReadLn;}
+	Result.Sort(TComparer<TBlock>.Construct(CompareBlocks));
+end;
+
 var
 	n, i: int32;
 	b: TBlock;
@@ -23,6 +39,8 @@ begin
 	SetTextBuf(Output, OutputBuf);
 
 	readln(n);
+
+	{blocks := ReadAndSort(n);}
 
 	blocks := TList<TBlock>.Create;
 	blocks.Capacity := n;
