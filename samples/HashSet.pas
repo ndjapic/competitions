@@ -1,4 +1,4 @@
-program D_Bonfire;
+program GenericHashSetTemplate;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 uses
 	Generics.Defaults;
