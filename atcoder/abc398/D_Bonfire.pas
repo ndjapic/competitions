@@ -1,79 +1,108 @@
 program D_Bonfire;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-const
-	HASH_SIZE = 1 shl 18;
-	MASK = HASH_SIZE - 1;
-	MAX_NODES = 200 * 1000;
+uses
+	Generics.Defaults;
 type
-	TNode = record
-		x, y: int32;
-		next: int32;
+	THashSet<_T> = record
+	private
+		const
+			HASH_SIZE = 1 shl 18;
+			MASK = HASH_SIZE - 1;
+			MAX_NODES = 200 * 1000;
+		type
+			TNode = record
+				Value: _T;
+				Next: int32;
+			end;
+	private
+		HashTable: array [0 .. MASK] of int32;
+		Pool: array [1 .. MAX_NODES] of TNode;
+		FCount: int32;
+		Comparer: IEqualityComparer<_T>;
+		function GetHash(const Item: _T): int32; inline;
+	public
+		procedure Init;
+		procedure Add(const Item: _T);
+		function Contains(const Item: _T): boolean;
+		property Count: int32 read FCount;
 	end;
-var
-	n, i, j, k, r, c: int32;
-	s, a: string;
-	HashTable: array [0 .. MASK] of int32;
-	Pool: array [1 .. MAX_NODES] of TNode;
-	PoolPtr: int32 = 0;
-	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function GetHash(x, y: int32): int32;
+function THashSet<_T>.GetHash(const Item: _T): int32;
 begin
-	result := (int32(uint32(x) * 73856093) xor int32(uint32(y) * 19349663)) and MASK;
+	result := Comparer.GetHashCode(Item) and MASK;
 end;
 
-procedure Add(x, y: int32);
+procedure THashSet<_T>.Init;
+begin
+	FCount := 0;
+	FillChar(HashTable, SizeOf(HashTable), 0);
+	Comparer := TEqualityComparer<_T>.Default;
+end;
+
+function THashSet<_T>.Contains(const Item: _T): boolean;
+var
+	idx: int32;
+	found: boolean;
+begin
+	idx := HashTable[GetHash(Item)];
+	found := false;
+
+	while (idx <> 0) and not found do
+		if Comparer.Equals(Pool[idx].Value, Item) then
+			found := true
+		else
+			idx := Pool[idx].Next;
+
+	result := found;
+end;
+
+procedure THashSet<_T>.Add(const Item: _T);
 var
 	h: int32;
 begin
-	h := GetHash(x, y);
-	inc(PoolPtr);
-	Pool[PoolPtr].x := x;
-	Pool[PoolPtr].y := y;
-	Pool[PoolPtr].next := HashTable[h];
-	HashTable[h] := PoolPtr;
-end;
-
-function Contains(x, y: int32): boolean;
-var
-	idx: int32;
-begin
-	idx := HashTable[GetHash(x, y)];
-	result := false;
-	while (idx <> 0) and not result do begin
-		result := (Pool[idx].x = x) and (Pool[idx].y = y);
-		idx := Pool[idx].next;
+	if not Contains(Item) then begin
+		h := GetHash(Item);
+		Inc(FCount);
+		Pool[FCount].Value := Item;
+		Pool[FCount].Next := HashTable[h];
+		HashTable[h] := FCount;
 	end;
 end;
 
+type
+	TCell = record
+		r, c: int32;
+	end;
+var
+	CellSet: THashSet<TCell>;
+	smoke, target: TCell;
+	n, k: int32;
+	s, res: string;
+
 begin
-	SetTextBuf(Input, InputBuf);
-	SetTextBuf(Output, OutputBuf);
+	CellSet.Init;
 
-	readln(n, r, c);
+	readln(n, target.r, target.c);
 	readln(s);
-	setlength(a, n);
+	SetLength(res, n);
 
-	i := 0;
-	j := 0;
-	fillchar(HashTable, sizeof(HashTable), 0);
-	Add(i, j);
+	smoke.r := 0;
+	smoke.c := 0;
+	CellSet.Add(smoke);
 
 	for k := 1 to n do begin
 		case s[k] of
-			'N': begin inc(r); inc(i); end;
-			'W': begin inc(c); inc(j); end;
-			'S': begin dec(r); dec(i); end;
-			'E': begin dec(c); dec(j); end;
+			'N': begin inc(target.r); inc(smoke.r); end;
+			'W': begin inc(target.c); inc(smoke.c); end;
+			'S': begin dec(target.r); dec(smoke.r); end;
+			'E': begin dec(target.c); dec(smoke.c); end;
 		end;
 
-		Add(i, j);
-
-		if Contains(r, c) then
-			a[k] := '1'
+		CellSet.Add(smoke);
+		if CellSet.Contains(target) then
+			res[k] := '1'
 		else
-			a[k] := '0';
+			res[k] := '0';
 	end;
-
-	writeln(a);
+	writeln(res);
 end.
