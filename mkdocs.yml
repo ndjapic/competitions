@@ -19,6 +19,9 @@ docs_dir: .
 exclude_docs: |
   .github/
   .git/
+  mkdocs.yml
+  site/
+  publish.yml
 
 nav:
   - Почетна: docs/index.md
