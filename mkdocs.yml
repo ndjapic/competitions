@@ -21,6 +21,6 @@ exclude_docs: |
   .git/
 
 nav:
-  - Почетна: index.md
+  - Почетна: docs/index.md
   - Код (Source): 
       - src/
