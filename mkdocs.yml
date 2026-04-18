@@ -15,6 +15,5 @@ markdown_extensions:
 
 nav:
   - Почетна: index.md
-  - Код (Source): 
-      - src/
-
+  - Архива задатака: zadaci/
+  - Изворни код (Source): src/
