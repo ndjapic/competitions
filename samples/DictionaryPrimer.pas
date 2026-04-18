@@ -3,96 +3,97 @@ program DictionaryPrimer;
 {$APPTYPE CONSOLE}
 
 uses
-  System.SysUtils, Generics.Collections;
+	System.SysUtils, Generics.Collections;
 
 var
-  Mapa: TDictionary<string, Integer>;
-  Kljuc: string;
-  Par: TPair<string, Integer>; // Tip za for-in petlju
+	Mapa: TDictionary<string, Integer>;
+	Key: string;
+	Par: TPair<string, Integer>; // Tip za for-in petlju
 
 begin
-  // 1. Inicijalizacija
-  Mapa := TDictionary<string, Integer>.Create;
-  {Mapa.Capacity := 100000;}
-  try
-    // 2. Dodavanje i ažuriranje (Items[] radi oba bezbedno)
-    Mapa.AddOrSetValue('Srbija', 10);
-    Mapa['Grcka'] := 5;
-    Mapa['Srbija'] := 15; // Ažuriranje postojeće vrednosti
+	// 1. Inicijalizacija
+	Mapa := TDictionary<string, Integer>.Create;
+	{Mapa.Capacity := 100000;}
+	try
+		// 2. Dodavanje i ažuriranje (Items[] radi oba bezbedno)
+		Mapa.AddOrSetValue('Srbija', 10);
+		Mapa['Grcka'] := 5;
+		Mapa['Srbija'] := 15; // Ažuriranje postojeće vrednosti
 
-    // 3. Provera postojanja i čitanje (TryGetValue je najbrži)
-    if Mapa.ContainsKey('Srbija') then
-      WriteLn('Srbija postoji sa vrednošću: ', Mapa['Srbija']);
+		// 3. Provera postojanja i čitanje (TryGetValue je najbrži)
+		if Mapa.ContainsKey('Srbija') then
+			WriteLn('Srbija postoji sa vrednošću: ', Mapa['Srbija']);
 
-    // 4. Prolaz kroz sve elemente (Iteracija)
-    WriteLn('--- Sadržaj rečnika ---');
-    for Par in Mapa do
-      WriteLn(Par.Key, ': ', Par.Value);
+		// 4. Prolaz kroz sve elemente (Iteracija)
+		WriteLn('--- Sadržaj rečnika ---');
+		for Par in Mapa do
+			WriteLn(Par.Key, ': ', Par.Value);
 
-    // 5. Brisanje
-    Mapa.Remove('Grcka');
+		// 5. Brisanje
+		Mapa.Remove('Grcka');
 
-    // 6. Broj elemenata
-    WriteLn('Preostalo elemenata: ', Mapa.Count);
+		// 6. Broj elemenata
+		WriteLn('Preostalo elemenata: ', Mapa.Count);
 
-    // 7. Pražnjenje
-    Mapa.Clear;
+		// 7. Pražnjenje
+		Mapa.Clear;
 
-  finally
-    // 8. Oslobađanje memorije (Obavezno!)
-    Mapa.Free;
-  end;
-  
-  ReadLn;
+	finally
+		// 8. Oslobađanje memorije (Obavezno!)
+		Mapa.Free;
+	end;
+	
+	ReadLn;
 end.
 
 
-uses System.Generics.Collections, System.Generics.Defaults;
+uses
+	System.Generics.Collections, System.Generics.Defaults;
 
 var
-  ListaKljuceva: TList<string>;
-  Kljuc: string;
+	ListaKeyeva: TList<string>;
+	Key: string;
 begin
-  // Prebacivanje ključeva u listu
-  ListaKljuceva := TList<string>.Create;
-  for Kljuc in Mapa.Keys do
-    ListaKljuceva.Add(Kljuc);
+	// Prebacivanje ključeva u listu
+	ListaKeyeva := TList<string>.Create;
+	for Key in Mapa.Keys do
+		ListaKeyeva.Add(Key);
 
-  // Sortiranje (podrazumevano rastuće)
-  ListaKljuceva.Sort;
+	// Sortiranje (podrazumevano rastuće)
+	ListaKeyeva.Sort;
 
-  // Ispis po redosledu
-  for Kljuc in ListaKljuceva do
-    WriteLn(Kljuc, ': ', Mapa[Kljuc]);
+	// Ispis po redosledu
+	for Key in ListaKeyeva do
+		WriteLn(Key, ': ', Mapa[Key]);
 
-  ListaKljuceva.Free;
+	ListaKeyeva.Free;
 end;
 
 
 type
-  TSigurniHash = class(TInterfacedObject, IEqualityComparer<Integer>)
-    function Equals(const Left, Right: Integer): Boolean;
-    function GetHashCode(const Value: Integer): Integer;
-  end;
+	TSafeHash = class(TInterfacedObject, IEqualityComparer<Integer>)
+		function Equals(const Left, Right: Integer): Boolean;
+		function GetHashCode(const Value: Integer): Integer;
+	end;
 
-function TSigurniHash.Equals(const Left, Right: Integer): Boolean;
+function TSafeHash.Equals(const Left, Right: Integer): Boolean;
 begin
-  exit(Left = Right);
+	Result := Left = Right;
 end;
 
-function TSigurniHash.GetHashCode(const Value: Integer): Integer;
+function TSafeHash.GetHashCode(const Value: Integer): Integer;
 begin
-  // Dodavanje nasumičnog XOR-a (seed) otežava predviđanje kolizija
-  // Seed bi trebalo da bude neka nasumična vrednost dobijena na početku (npr. Random(MaxInt))
-  exit(Value xor 123456789); 
+	// Dodavanje nasumičnog XOR-a (seed) otežava predviđanje kolizija
+	// Seed bi trebalo da bude neka nasumična vrednost dobijena na početku (npr. Random(MaxInt))
+	Result := Value xor 123456789; 
 end;
 
 // Upotreba:
 var
-  Mapa: TDictionary<Integer, Integer>;
+	Mapa: TDictionary<Integer, Integer>;
 begin
-  Mapa := TDictionary<Integer, Integer>.Create(TSigurniHash.Create);
-  // ... dalje se koristi normalno ...
+	Mapa := TDictionary<Integer, Integer>.Create(TSafeHash.Create);
+	// ... dalje se koristi normalno ...
 end;
 
 
@@ -101,60 +102,56 @@ program MultimapPrimer;
 {$APPTYPE CONSOLE}
 
 uses
-  System.SysUtils, Generics.Collections;
+	System.SysUtils, Generics.Collections;
 
 type
-  // Definisanje tipa radi lakšeg čitanja
-  TListaVrednosti = TList<Integer>;
-  TMultimap = TDictionary<string, TListaVrednosti>;
+	TMultimap = TDictionary<string, TList<Integer>>;
 
 var
-  Mapa: TMultimap;
-  Lista: TListaVrednosti;
-  Kljuc: string;
-  Vrednost: Integer;
+	Mapa: TMultimap;
+	Lista: TList<Integer>;
+	Key: string;
+	Value: Integer;
 
-procedure DodajVrednost(AMapa: TMultimap; const AKljuc: string; AVrednost: Integer);
+procedure DodajValue(AMapa: TMultimap; const AKey: string; AValue: Integer);
 var
-  L: TListaVrednosti;
+	L: TList<Integer>;
 begin
-  // Proveravamo da li lista za taj ključ već postoji
-  if not AMapa.TryGetValue(AKljuc, L) then
-  begin
-    // Ako ne postoji, kreiramo novu listu i dodajemo je u rečnik
-    L := TListaVrednosti.Create;
-    AMapa.Add(AKljuc, L);
-  end;
-  // Dodajemo vrednost u listu (bilo da je nova ili stara)
-  L.Add(AVrednost);
+	// Proveravamo da li lista za taj ključ već postoji
+	if not AMapa.TryGetValue(AKey, L) then begin
+		// Ako ne postoji, kreiramo novu listu i dodajemo je u rečnik
+		L := TList<Integer>.Create;
+		AMapa.Add(AKey, L);
+	end;
+	// Dodajemo vrednost u listu (bilo da je nova ili stara)
+	L.Add(AValue);
 end;
 
 begin
-  Mapa := TMultimap.Create;
-  {TObjectDictionary<string, TList<Integer>>.Create([doFreeOnRelease])}
-  try
-    // Dodavanje vrednosti
-    DodajVrednost(Mapa, 'A', 10);
-    DodajVrednost(Mapa, 'A', 20);
-    DodajVrednost(Mapa, 'B', 50);
+	Mapa := TMultimap.Create;
+	{TObjectDictionary<string, TList<Integer>>.Create([doFreeOnRelease])}
+	try
+		// Dodavanje vrednosti
+		DodajValue(Mapa, 'A', 10);
+		DodajValue(Mapa, 'A', 20);
+		DodajValue(Mapa, 'B', 50);
 
-    // Iteracija kroz multimap
-    for Kljuc in Mapa.Keys do
-    begin
-      Write(Kljuc, ': ');
-      for Vrednost in Mapa[Kljuc] do
-        Write(Vrednost, ' ');
-      WriteLn;
-    end;
+		// Iteracija kroz multimap
+		for Key in Mapa.Keys do begin
+			Write(Key, ': ');
+			for Value in Mapa[Key] do
+				Write(Value, ' ');
+			WriteLn;
+		end;
 
 {Lista.BinarySearch(vrednost, index)}
 
-  finally
-    // KRITIČNO: Prvo moramo obrisati svaku listu pojedinačno, pa onda rečnik
-    for Lista in Mapa.Values do
-      Lista.Free;
-    Mapa.Free;
-  end;
+	finally
+		// KRITIČNO: Prvo moramo obrisati svaku listu pojedinačno, pa onda rečnik
+		for Lista in Mapa.Values do
+			Lista.Free;
+		Mapa.Free;
+	end;
 
-  ReadLn;
+	ReadLn;
 end.
