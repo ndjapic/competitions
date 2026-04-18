@@ -51,22 +51,22 @@ uses
 	System.Generics.Collections, System.Generics.Defaults;
 
 var
-	ListaKeyeva: TList<string>;
+	KeysList: TList<string>;
 	Key: string;
 begin
 	// Prebacivanje ključeva u listu
-	ListaKeyeva := TList<string>.Create;
+	KeysList := TList<string>.Create;
 	for Key in Mapa.Keys do
-		ListaKeyeva.Add(Key);
+		KeysList.Add(Key);
 
 	// Sortiranje (podrazumevano rastuće)
-	ListaKeyeva.Sort;
+	KeysList.Sort;
 
 	// Ispis po redosledu
-	for Key in ListaKeyeva do
+	for Key in KeysList do
 		WriteLn(Key, ': ', Mapa[Key]);
 
-	ListaKeyeva.Free;
+	KeysList.Free;
 end;
 
 
@@ -113,7 +113,7 @@ var
 	Key: string;
 	Value: Integer;
 
-procedure DodajValue(AMapa: TMultimap; const AKey: string; AValue: Integer);
+procedure AddValue(AMapa: TMultimap; const AKey: string; AValue: Integer);
 var
 	L: TList<Integer>;
 begin
@@ -132,9 +132,9 @@ begin
 	{TObjectDictionary<string, TList<Integer>>.Create([doFreeOnRelease])}
 	try
 		// Dodavanje vrednosti
-		DodajValue(Mapa, 'A', 10);
-		DodajValue(Mapa, 'A', 20);
-		DodajValue(Mapa, 'B', 50);
+		AddValue(Mapa, 'A', 10);
+		AddValue(Mapa, 'A', 20);
+		AddValue(Mapa, 'B', 50);
 
 		// Iteracija kroz multimap
 		for Key in Mapa.Keys do begin
