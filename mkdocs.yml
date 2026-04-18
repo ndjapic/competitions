@@ -1,0 +1,26 @@
+site_name: Моја такмичења
+theme:
+  name: material
+  language: sr
+  features:
+    - search.suggest
+    - search.highlight
+    - navigation.tabs
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - attr_list
+
+# Ово говори MkDocs-у да занемари чињеницу да фајлови нису у docs
+docs_dir: .
+# Ово спречава да се на сајту појаве системски Гит фајлови
+exclude_docs: |
+  .github/
+  .git/
+
+nav:
+  - Почетна: index.md
+  - Код (Source): 
+      - src/
