@@ -13,17 +13,8 @@ markdown_extensions:
   - pymdownx.superfences
   - attr_list
 
-# Ово говори MkDocs-у да занемари чињеницу да фајлови нису у docs
-docs_dir: .
-# Ово спречава да се на сајту појаве системски Гит фајлови
-exclude_docs: |
-  .github/
-  .git/
-  mkdocs.yml
-  site/
-  publish.yml
-
 nav:
-  - Почетна: docs/index.md
+  - Почетна: index.md
   - Код (Source): 
       - src/
+
