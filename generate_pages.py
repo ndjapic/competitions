@@ -2,7 +2,7 @@ import os
 
 # Путања до твог кода и где желиш странице
 src_dir = 'docs/src'
-output_dir = 'docs/zadaci'
+output_dir = 'docs/problems'
 
 # Направи фолдер за странице ако не постоји
 if not os.path.exists(output_dir):
@@ -30,9 +30,9 @@ for root, dirs, files in os.walk(src_dir):
             
             # Напиши маркдаун фајл
             with open(md_file_path, 'w', encoding='utf-8') as f:
-                f.write(f"# Задатак: {file}\n\n")
+                f.write(f"# Problem: {file}\n\n")
                 f.write("```pascal\n")
                 f.write(pascal_code)
                 f.write("\n```\n")
 
-print("Готово! Све странице су генерисане у docs/zadaci")
+print("Готово! Све странице су генерисане у", output_dir)
