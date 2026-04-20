@@ -1,10 +1,12 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-const
-	nn = 100;
+uses
+	generics.collections,
+	generics.defaults;
 var
-	n, i, l, r, x, c: int8;
-	a: array [1 .. nn] of int32;
+	n, i, x: int8;
+	elm: int32;
+	a: tlist<int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
@@ -14,23 +16,18 @@ begin
 
 	readln(n);
 
-	for i := 1 to n do read(a[i]);
-	readln;
-
-	l := 0;
-	r := n+1;
-	while r-l > 1 do begin
-		x := (l+r) div 2;
-
-		c := 0;
-		for i := 1 to n do
-			if a[i] >= x then inc(c);
-
-		if c >= x then
-			l := x
-		else
-			r := x;
+	a := tlist<int32>.create;
+	for i := 0 to n-1 do begin
+		read(elm);
+		a.add(elm);
+		a.exchange(i, random(i+1));
 	end;
+	readln;
+	a.sort;
 
-	writeln(l);
+	x := n;
+	while (x > 0) and (a[n-x] < x) do dec(x);
+
+	writeln(x);
+	a.free;
 end.
