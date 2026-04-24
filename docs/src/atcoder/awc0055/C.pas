@@ -4,7 +4,7 @@ uses
 	generics.collections,
 	generics.defaults;
 var
-	n, i, j, elm, ans: int32;
+	n, i, j, elm: int32;
 	w, c: tlist<int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
@@ -35,14 +35,10 @@ begin
 		c.sort;
 
 		i := 0;
-		ans := 0;
 		for j := 0 to n-1 do
-			if w[i] <= c[j] then begin
-				inc(ans);
-				inc(i);
-			end;
+			if w[i] <= c[j] then inc(i);
 
-		writeln(ans);
+		writeln(i);
 
 	finally
 		w.free;
