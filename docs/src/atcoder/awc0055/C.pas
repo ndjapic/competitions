@@ -35,15 +35,12 @@ begin
 		c.sort;
 
 		i := 0;
-		j := 0;
 		ans := 0;
-		while (i < n) and (j < n) do
+		for j := 0 to n-1 do
 			if w[i] <= c[j] then begin
 				inc(ans);
 				inc(i);
-				inc(j);
-			end else
-				inc(j);
+			end;
 
 		writeln(ans);
 
