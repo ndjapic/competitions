@@ -124,4 +124,5 @@ begin
 	end;
 
 	writeln(ans);
+	pq.free;
 end.
