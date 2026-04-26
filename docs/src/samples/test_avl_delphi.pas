@@ -1,7 +1,5 @@
 program test_avl_delphi;
-
 {$MODE DELPHI}
-
 uses
 	AVL_Tree, SysUtils, Math;
 
@@ -25,7 +23,7 @@ begin
 		Vals[0] := 9223372036854775807; // Max Int64
 		Vals[1] := 10;
 		Vals[2] := -9223372036854775808; // Min Int64
-		Vals[3] := 5000000000;					// Više od 32-bitnog Integera
+		Vals[3] := 5000000000; // Više od 32-bitnog Integera
 
 		Writeln('Ubacujem Int64 vrednosti...');
 		for I := 0 to High(Vals) do
