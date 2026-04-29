@@ -17,11 +17,11 @@ type
 		class function CompareNodes(D1, D2: Pointer): Integer; static;
 	public
 		constructor Create;
+		procedure Clear;
 		destructor Destroy; override;
 		procedure Add(const K: TKey; const V: TValue);
 		function TryGetValue(const K: TKey; out V: TValue): Boolean;
 		procedure Remove(const K: TKey);
-		procedure Clear;
 		function Count: Integer;
 	end;
 
@@ -36,15 +36,21 @@ begin
 	FTree := TAVLTree.Create(CompareNodes);
 end;
 
-destructor TSortedDictionary<TKey, TValue>.Destroy;
-var Node: TAVLTreeNode;
+procedure TSortedDictionary<TKey, TValue>.Clear;
+var 
+	Node: TAVLTreeNode;
 begin
 	Node := FTree.FindLowest;
 	while Assigned(Node) do begin
 		Dispose(PNodeData(Node.Data));
 		Node := FTree.FindSuccessor(Node);
 	end;
-	FTree.Free;
+	FTree.Clear; // Сада је стабло потпуно празно и спремно за нове податке
+end;
+
+destructor TSortedDictionary<TKey, TValue>.Destroy;
+begin
+	Clear;
 	inherited;
 end;
 
@@ -86,18 +92,6 @@ begin
 		// 2. Затим уклањамо сам чвор из стабла
 		FTree.Delete(Node);
 	end;
-end;
-
-procedure TSortedDictionary<TKey, TValue>.Clear;
-var 
-	Node: TAVLTreeNode;
-begin
-	Node := FTree.FindLowest;
-	while Assigned(Node) do begin
-		Dispose(PNodeData(Node.Data));
-		Node := FTree.FindSuccessor(Node);
-	end;
-	FTree.Clear; // Сада је стабло потпуно празно и спремно за нове податке
 end;
 
 function TSortedDictionary<TKey, TValue>.Count: Integer;
