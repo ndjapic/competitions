@@ -42,7 +42,7 @@ begin
 		// 8. Oslobađanje memorije (Obavezno!)
 		Mapa.Free;
 	end;
-	
+
 	ReadLn;
 end.
 
