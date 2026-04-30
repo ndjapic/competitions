@@ -2,10 +2,10 @@ program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 var
 	b: int64;
-	a: int8;
+	l, r, m: int8;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function xpowx(x: int8): int64;
+function xpowx(x: int8): uint64;
 var
 	i: int8;
 begin
@@ -19,9 +19,17 @@ begin
 
 	readln(b);
 
-	a := 15;
-	while xpowx(a) > b do dec(a);
+	l := 1;
+	r := 16;
 
-	if xpowx(a) < b then a := -1;
-	writeln(a);
+	while r-l > 1 do begin
+		m := (l+r) div 2;
+		if xpowx(m) > b then
+			r := m
+		else
+			l := m;
+	end;
+
+	if xpowx(l) < b then l := -1;
+	writeln(l);
 end.
