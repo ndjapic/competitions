@@ -1,3 +1,31 @@
+def manachers_table(s):
+    t = "#" + "#".join(s) + "#"
+    n = len(t)
+    p = [0] * n
+    c = r = 0
+    for i in range(n):
+        mirror = 2 * c - i
+        if i < r:
+            p[i] = min(r - i, p[mirror])
+        while i + 1 + p[i] < n and i - 1 - p[i] >= 0 and t[i + 1 + p[i]] == t[i - 1 - p[i]]:
+            p[i] += 1
+        if i + p[i] > r:
+            c = i
+            r = i + p[i]
+    return t, p
+
+s = "abaaba"
+t, p = manachers_table(s)
+print(f"{'Index i':<8} | {'t[i]':<5} | {'p[i]':<5} | {'Original (s)':<15}")
+print("-" * 45)
+for i in range(len(t)):
+    start_s = (i - p[i]) // 2
+    length_s = p[i]
+    sub_s = s[start_s:start_s + length_s] if length_s > 0 else ""
+    print(f"{i:<8} | {t[i]:<5} | {p[i]:<5} | {sub_s:<15}")
+
+################ cut here
+
 def manacher(s):
     # Претварамо "aba" у "#a#b#a#" да бисмо подржали парне палиндроме
     t = "#" + "#".join(s) + "#"
