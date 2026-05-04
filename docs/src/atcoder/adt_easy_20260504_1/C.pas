@@ -9,7 +9,7 @@ var
 	s: string;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function CompareBlocks(constref Left, Right: string): Integer;
+function CompareLength(constref Left, Right: string): Integer;
 begin
 	Result := Length(Left) - Length(Right);
 end;
@@ -28,7 +28,7 @@ begin
 		sl.Exchange(i, random(i+1));
 	end;
 
-	sl.Sort(TComparer<string>.Construct(CompareBlocks));
+	sl.Sort(TComparer<string>.Construct(CompareLength));
 
 	for s in sl do write(s);
 	writeln;
