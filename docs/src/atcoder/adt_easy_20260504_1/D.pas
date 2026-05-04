@@ -19,7 +19,7 @@ begin
 	for i := 1 to n do begin
 		read(j);
 		a[i] := j;
-		seen[j] := true;
+		if j > -1 then seen[j] := true;
 	end;
 	readln;
 
