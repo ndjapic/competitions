@@ -1,7 +1,7 @@
 program sorted_dict_avl;
 {$MODE DELPHI}
 uses
-	AVL_Tree, Generics.Defaults, SysUtils, Math;
+	AVL_Tree, Generics.Defaults;
 type
 	TSortedDictionary<TKey, TValue> = class
 	public
@@ -21,6 +21,8 @@ type
 		destructor Destroy; override;
 		procedure Add(const K: TKey; const V: TValue);
 		function TryGetValue(const K: TKey; out V: TValue): Boolean;
+		function FindLowest: PNodeData;
+		function FindHighest: PNodeData;
 		procedure Remove(const K: TKey);
 		function Count: Integer;
 	end;
@@ -77,6 +79,16 @@ begin
 	Node := FTree.Find(@Dummy);
 	Result := Assigned(Node);
 	if Result then V := PNodeData(Node.Data)^.Value;
+end;
+
+function TSortedDictionary<TKey, TValue>.FindLowest: PNodeData;
+begin
+	Result := PNodeData(FTree.FindLowest.Data);
+end;
+
+function TSortedDictionary<TKey, TValue>.FindHighest: PNodeData;
+begin
+	Result := PNodeData(FTree.FindHighest.Data);
 end;
 
 procedure TSortedDictionary<TKey, TValue>.Remove(const K: TKey);
