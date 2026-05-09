@@ -1,153 +1,149 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #simple #treap #min #max
 uses
-	AVL_Tree, Generics.Defaults;
+	Math;
 type
-	TSortedDictionary<TKey, TValue> = class
-	public
-		type
-			PNodeData = ^TNodeData;
-			TNodeData = record
-				Key: TKey;
-				Value: TValue;
-			end;
-	private
-		FTree: TAVLTree;
-		class function CompareNodes(D1, D2: Pointer): Integer; static;
-	public
-		constructor Create;
-		procedure Clear;
-		destructor Destroy; override;
-		procedure Add(const K: TKey; const V: TValue);
-		function TryGetValue(const K: TKey; out V: TValue): Boolean;
-		function FindLowest: PNodeData;
-		function FindHighest: PNodeData;
-		procedure Remove(const K: TKey);
-		function Count: Integer;
+	PNode = ^TNode;
+	TNode = record
+		Key: Int32;
+		Priority, Size, Count: Int32;
+		Left, Right: PNode;
 	end;
-
-class function TSortedDictionary<TKey, TValue>.CompareNodes(D1, D2: Pointer): Integer;
-begin
-	Result := TComparer<TKey>.Default.Compare(PNodeData(D1)^.Key, PNodeData(D2)^.Key);
-end;
-
-constructor TSortedDictionary<TKey, TValue>.Create;
-begin
-	FTree := TAVLTree.Create(CompareNodes);
-end;
-
-procedure TSortedDictionary<TKey, TValue>.Clear;
-var 
-	Node: TAVLTreeNode;
-begin
-	Node := FTree.FindLowest;
-	while Assigned(Node) do begin
-		Dispose(PNodeData(Node.Data));
-		Node := FTree.FindSuccessor(Node);
-	end;
-	FTree.Clear;
-end;
-
-destructor TSortedDictionary<TKey, TValue>.Destroy;
-begin
-	Clear;
-	inherited;
-end;
-
-procedure TSortedDictionary<TKey, TValue>.Add(const K: TKey; const V: TValue);
-var 
-	Data: PNodeData;
-	Existing: TAVLTreeNode;
-begin
-	New(Data); Data.Key := K; Data.Value := V;
-	Existing := FTree.Find(Data);
-	if Assigned(Existing) then begin
-		PNodeData(Existing.Data)^.Value := V;
-		Dispose(Data);
-	end else
-		FTree.Add(Data);
-end;
-
-function TSortedDictionary<TKey, TValue>.TryGetValue(const K: TKey; out V: TValue): Boolean;
-var 
-	Dummy: TNodeData;
-	Node: TAVLTreeNode;
-begin
-	Dummy.Key := K;
-	Node := FTree.Find(@Dummy);
-	Result := Assigned(Node);
-	if Result then V := PNodeData(Node.Data)^.Value;
-end;
-
-function TSortedDictionary<TKey, TValue>.FindLowest: PNodeData;
-begin
-	Result := PNodeData(FTree.FindLowest.Data);
-end;
-
-function TSortedDictionary<TKey, TValue>.FindHighest: PNodeData;
-begin
-	Result := PNodeData(FTree.FindHighest.Data);
-end;
-
-procedure TSortedDictionary<TKey, TValue>.Remove(const K: TKey);
 var
-	Dummy: TNodeData;
-	Node: TAVLTreeNode;
-begin
-	Dummy.Key := K;
-	Node := FTree.Find(@Dummy);
-	if Assigned(Node) then begin
-		Dispose(PNodeData(Node.Data));
-		FTree.Delete(Node);
-	end;
-end;
-
-function TSortedDictionary<TKey, TValue>.Count: Integer;
-begin Result := FTree.Count; end;
-
-var
-	q, i, x, c, v, mn, mx: int32;
-	tp: int8;
-	s: TSortedDictionary<int32, int32>;
+	q, i, x, c, tp: Int32;
+	Root: PNode = nil;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
+
+function GetSize(N: PNode): Int32; inline;
+begin
+	if N = nil then
+		Result := 0
+	else
+		Result := N^.Size;
+end;
+
+procedure Update(N: PNode); inline;
+begin
+	if N <> nil then
+		N^.Size := GetSize(N^.Left) + GetSize(N^.Right) + N^.Count;
+end;
+
+function NewNode(K: Int32): PNode;
+begin
+	New(Result);
+	Result^.Key := K;
+	Result^.Priority := Random(MaxInt);
+	Result^.Count := 1;
+	Result^.Size := 1;
+	Result^.Left := nil;
+	Result^.Right := nil;
+end;
+
+procedure Split(N: PNode; K: Int32; out L, R: PNode);
+begin
+	if N = nil then begin
+		L := nil;
+		R := nil;
+	end else if N^.Key < K then begin
+		Split(N^.Right, K, N^.Right, R);
+		L := N;
+	end else begin
+		Split(N^.Left, K, L, N^.Left);
+		R := N;
+	end;
+	Update(N);
+end;
+
+procedure Merge(var N: PNode; L, R: PNode);
+begin
+	if R = nil then
+		N := L
+	else if L = nil then
+		N := R
+	else if L^.Priority > R^.Priority then begin
+		Merge(L^.Right, L^.Right, R);
+		N := L;
+	end else begin
+		Merge(R^.Left, L, R^.Left);
+		N := R;
+	end;
+	Update(N);
+end;
+
+procedure Add(var N: PNode; K: Int32);
+var L, M, R: PNode;
+begin
+	Split(N, K, L, R);
+	Split(R, K + 1, M, R);
+
+	if M <> nil then begin
+		Inc(M^.Count);
+		Update(M);
+	end else
+		M := NewNode(K);
+
+	Merge(L, L, M);
+	Merge(N, L, R);
+end;
+
+procedure Remove(var N: PNode; K, C: Int32);
+var
+	L, M, R: PNode;
+begin
+	Split(N, K, L, R);
+	Split(R, K + 1, M, R);
+	if M <> nil then begin
+
+		if M^.Count > C then begin
+			Dec(M^.Count, C);
+			Update(M);
+			Merge(L, L, M);
+		end else
+			Dispose(M);
+
+	end;
+	Merge(N, L, R);
+end;
+
+function GetMin(N: PNode): Int32;
+begin
+	while N^.Left <> nil do
+		N := N^.Left;
+	Result := N^.Key;
+end;
+
+function GetMax(N: PNode): Int32;
+begin
+	while N^.Right <> nil do
+		N := N^.Right;
+	Result := N^.Key;
+end;
 
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
+	Randomize;
 
-	readln(q);
-
-	s := TSortedDictionary<int32, int32>.Create;
-
+	Readln(q);
 	for i := 1 to q do begin
-		read(tp);
+		Read(tp);
 		case tp of
 
 			1: begin
-				read(x);
-				if not s.TryGetValue(x, v) then v := 0;
-				s.Add(x, v+1);
+				Read(x);
+				Add(Root, x);
 			end;
 
 			2: begin
-				read(x, c);
-				if s.TryGetValue(x, v) then begin
-					if v > c then
-						s.Add(x, v - c)
-					else
-						s.Remove(x);
-				end;
+				Read(x, c);
+				Remove(Root, x, c);
 			end;
 
-			3: begin
-				mn := s.FindLowest^.Key;
-				mx := s.FindHighest^.Key;
-				writeln(mx - mn);
-			end;
+			3: if Root <> nil then
+				Writeln(GetMax(Root) - GetMin(Root));
 
 		end;
-		readln;
+		Readln;
 	end;
-
-	s.Free;
 end.

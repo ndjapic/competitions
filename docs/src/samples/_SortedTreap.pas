@@ -202,10 +202,10 @@ begin
 	n := a.Size; // Update n.
 
 	for i := 0 to n-1 do begin
-	  Write('Before Discard ', a[0], ': '); a.dfs; WriteLn;
-	  TSortedTreap<Int32>.Discard(a, a[0]);
+		Write('Before Discard ', a[0], ': '); a.dfs; WriteLn;
+		TSortedTreap<Int32>.Discard(a, a[0]);
 	end;
-	a.Free;
+	if a <> nil then a.Free;
 end.
 
 (*
