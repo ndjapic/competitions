@@ -1,7 +1,7 @@
 program GenericTreapTest;
 {$mode delphi}
 uses 
-	UGenericTreap, Generics.Defaults{, SysUtils}, Math;
+	UGenericTreap, Generics.Defaults, Math;
 
 function TreapCompare(constref Left, Right: Integer): Integer;
 begin
