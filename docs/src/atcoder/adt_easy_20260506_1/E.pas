@@ -1,225 +1,183 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-// #generic #treap #min #max
+// #simple #avltree #min #max
 uses
-	Generics.Defaults, Generics.Collections, Math;
+	Math;
+const
+	MAX_NODES = 200 * 1000;
 type
-	TTreap<T> = class
-	private
-		type
-			PNode = ^TNode;
-			TNode = record
-				Key: T;
-				Priority, Count: Integer;
-				Left, Right: PNode;
-			end;
-	private
-		FRoot: PNode;
-		FComparer: IComparer<T>;
-		function CreateNode(const AKey: T): PNode;
-		procedure DisposeNode(ANode: PNode);
-		procedure Split(ANode: PNode; const AKey: T; out AL, AR: PNode);
-		procedure Merge(var ANode: PNode; AL, AR: PNode);
-		function FindMin(ANode: PNode): PNode;
-		function FindMax(ANode: PNode): PNode;
-		function Find(ANode: PNode; const AKey: T): PNode;
-	public
-		constructor Create(AComparer: IComparer<T>);
-		destructor Destroy; override;
-		procedure Add(const AKey: T);
-		procedure Remove(const AKey: T; c: int32);
-		function GetMin: T;
-		function GetMax: T;
-		function IsEmpty: Boolean;
+	TNode = record
+		Key: Int32;
+		Count, Height, Left, Right: Int32;
 	end;
 var
-	q, i, x, c, tp: Int32;
-	t: TTreap<int32>;
-	InputBuf, OutputBuf: array [1 .. 65536] of Char;
+	Tree: array[0 .. MAX_NODES] of TNode;
+	Root: Int32 = 0;
+	NodeCount: Int32 = 0;
 
-constructor TTreap<T>.Create(AComparer: IComparer<T>);
+function NewNode(K: Int32): Int32; inline;
 begin
-	inherited Create;
-	FRoot := nil;
-	FComparer := AComparer;
-	Randomize;
+	Inc(NodeCount);
+	Tree[NodeCount].Key := K;
+	Tree[NodeCount].Count := 1;
+	Tree[NodeCount].Height := 1;
+	Tree[NodeCount].Left := 0;
+	Tree[NodeCount].Right := 0;
+	Result := NodeCount;
 end;
 
-destructor TTreap<T>.Destroy;
+function GetHeight(N: Int32): Int32; inline;
 begin
-	DisposeNode(FRoot);
-	inherited;
+	if N = 0 then
+		Result := 0
+	else
+		Result := Tree[N].Height;
 end;
 
-procedure TTreap<T>.DisposeNode(ANode: PNode);
+procedure UpdateHeight(N: Int32); inline;
 begin
-	if ANode <> nil then begin
-		DisposeNode(ANode^.Left);
-		DisposeNode(ANode^.Right);
-		Dispose(ANode);
-	end;
+	Tree[N].Height := 1 + Max(GetHeight(Tree[N].Left), GetHeight(Tree[N].Right));
 end;
 
-function TTreap<T>.CreateNode(const AKey: T): PNode;
+function GetBalance(N: Int32): Int32; inline;
 begin
-	New(Result);
-	Result^.Key := AKey;
-	Result^.Priority := Random(MaxInt);
-	Result^.Count := 1;
-	Result^.Left := nil;
-	Result^.Right := nil;
+	if N = 0 then
+		Result := 0
+	else
+		Result := GetHeight(Tree[N].Left) - GetHeight(Tree[N].Right);
 end;
 
-procedure TTreap<T>.Split(ANode: PNode; const AKey: T; out AL, AR: PNode);
+function RightRotate(Y: Int32): Int32;
+var X, T2: Int32;
 begin
-	if ANode = nil then begin
-		AL := nil;
-		AR := nil;
-	end else if FComparer.Compare(ANode^.Key, AKey) < 0 then begin
-		Split(ANode^.Right, AKey, ANode^.Right, AR);
-		AL := ANode;
+	X := Tree[Y].Left;
+	T2 := Tree[X].Right;
+	Tree[X].Right := Y;
+	Tree[Y].Left := T2;
+	UpdateHeight(Y);
+	UpdateHeight(X);
+	Result := X;
+end;
+
+function LeftRotate(X: Int32): Int32;
+var Y, T2: Int32;
+begin
+	Y := Tree[X].Right;
+	T2 := Tree[Y].Left;
+	Tree[Y].Left := X;
+	Tree[X].Right := T2;
+	UpdateHeight(X);
+	UpdateHeight(Y);
+	Result := Y;
+end;
+
+function BalanceNode(N: Int32): Int32;
+var Balance: Int32;
+begin
+	UpdateHeight(N);
+	Balance := GetBalance(N);
+	if Balance > 1 then begin
+		if GetBalance(Tree[N].Left) < 0 then
+			Tree[N].Left := LeftRotate(Tree[N].Left);
+		Result := RightRotate(N);
+	end else if Balance < -1 then begin
+		if GetBalance(Tree[N].Right) > 0 then
+			Tree[N].Right := RightRotate(Tree[N].Right);
+		Result := LeftRotate(N);
+	end else Result := N;
+end;
+
+function Insert(N: Int32; K: Int32): Int32;
+begin
+	if N = 0 then
+		Result := NewNode(K)
+	else if K = Tree[N].Key then begin
+		Inc(Tree[N].Count);
+		Result := N;
 	end else begin
-		Split(ANode^.Left, AKey, AL, ANode^.Left);
-		AR := ANode;
-	end;
-end;
-
-procedure TTreap<T>.Merge(var ANode: PNode; AL, AR: PNode);
-begin
-	if (AL = nil) or (AR = nil) then begin
-		if AL <> nil then ANode := AL else ANode := AR;
-	end else if AL^.Priority > AR^.Priority then begin
-		Merge(AL^.Right, AL^.Right, AR);
-		ANode := AL;
-	end else begin
-		Merge(AR^.Left, AL, AR^.Left);
-		ANode := AR;
-	end;
-end;
-
-function TTreap<T>.Find(ANode: PNode; const AKey: T): PNode;
-var
-	Cmp: Integer;
-begin
-	if ANode = nil then
-		Result := nil
-	else begin
-		Cmp := FComparer.Compare(AKey, ANode^.Key);
-		if Cmp < 0 then
-			Result := Find(ANode^.Left, AKey)
-		else if Cmp > 0 then
-			Result := Find(ANode^.Right, AKey)
+		if K < Tree[N].Key then
+			Tree[N].Left := Insert(Tree[N].Left, K)
 		else
-			Result := ANode;
+			Tree[N].Right := Insert(Tree[N].Right, K);
+		Result := BalanceNode(N);
 	end;
 end;
 
-procedure TTreap<T>.Add(const AKey: T);
-var
-	L, R: PNode;
-	Node: PNode;
+function FindMinNode(N: Int32): Int32; inline;
 begin
-	Node := Find(FRoot, AKey);
-	if Node <> nil then
-		Inc(Node^.Count)
-	else begin
-		Split(FRoot, AKey, L, R);
-		Merge(L, L, CreateNode(AKey));
-		Merge(FRoot, L, R);
-	end;
+	Result := N;
+	if N <> 0 then
+		while Tree[Result].Left <> 0 do
+			Result := Tree[Result].Left;
 end;
 
-procedure TTreap<T>.Remove(const AKey: T; c: int32);
+function FindMaxNode(N: Int32): Int32; inline;
+begin
+	Result := N;
+	if N > 0 then
+		while Tree[Result].Right <> 0 do
+			Result := Tree[Result].Right;
+end;
 
-	procedure InternalDelete(var N: PNode; const K: T);
-	var
-		Cmp: Integer;
-		Old: PNode;
-	begin
-		if N <> nil then begin
-			Cmp := FComparer.Compare(K, N^.Key);
-			if Cmp < 0 then
-				InternalDelete(N^.Left, K)
-			else if Cmp > 0 then
-				InternalDelete(N^.Right, K)
-			else if N^.Count > c then
-				Dec(N^.Count, c)
-			else begin
-				Old := N;
-				Merge(N, N^.Left, N^.Right);
-				Finalize(Old^.Key);
-				Dispose(Old);
-			end;
+function Delete(N: Int32; K: Int32; C: Int32): Int32;
+var Temp: Int32;
+begin
+	Result := N;
+	if N > 0 then begin
+		if K < Tree[N].Key then
+			Tree[N].Left := Delete(Tree[N].Left, K, C)
+		else if K > Tree[N].Key then
+			Tree[N].Right := Delete(Tree[N].Right, K, C)
+		else if Tree[N].Count > C then
+			Dec(Tree[N].Count, C)
+		else if Tree[N].Right = 0 then
+			Result := Tree[N].Left
+		else if Tree[N].Left = 0 then
+			Result := Tree[N].Right
+		else begin
+			Temp := FindMinNode(Tree[N].Right);
+			Tree[N].Key := Tree[Temp].Key;
+			Tree[N].Count := Tree[Temp].Count;
+			// Бришемо заменски чвор из десног подстабла
+			Tree[N].Right := Delete(Tree[N].Right, Tree[Temp].Key, Tree[Temp].Count);
 		end;
+		if Result > 0 then Result := BalanceNode(Result);
 	end;
-
-begin
-	InternalDelete(FRoot, AKey);
 end;
 
-function TTreap<T>.FindMin(ANode: PNode): PNode;
-begin
-	Result := ANode;
-	if Result <> nil then
-		while Result^.Left <> nil do
-			Result := Result^.Left;
-end;
-
-function TTreap<T>.FindMax(ANode: PNode): PNode;
-begin
-	Result := ANode;
-	if Result <> nil then
-		while Result^.Right <> nil do
-			Result := Result^.Right;
-end;
-
-function TTreap<T>.GetMin: T;
-begin
-	Result := FindMin(FRoot)^.Key;
-end;
-
-function TTreap<T>.GetMax: T;
-begin
-	Result := FindMax(FRoot)^.Key;
-end;
-
-function TTreap<T>.IsEmpty: Boolean;
-begin
-	Result := FRoot = nil;
-end;
-
-function TreapCompare(constref Left, Right: int32): Integer;
-begin
-	Result := CompareValue(Left, Right);
-end;
+var
+	q, i, tp, x, c: Int32;
+	MinN, MaxN: Int32;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
-	Randomize;
 
-	Readln(q);
-	t := TTreap<int32>.Create(TComparer<int32>.Construct(TreapCompare));
-
+	if not SeekEof then Read(q);
 	for i := 1 to q do begin
 		Read(tp);
 		case tp of
 
 			1: begin
 				Read(x);
-				t.Add(x);
+				Root := Insert(Root, x);
 			end;
 
 			2: begin
 				Read(x, c);
-				t.Remove(x, c);
+				Root := Delete(Root, x, c);
 			end;
 
-			3: Writeln(t.GetMax - t.GetMin);
+			3: begin
+				MinN := FindMinNode(Root);
+				MaxN := FindMaxNode(Root);
+				if Root <> 0 then
+					Writeln(Tree[MaxN].Key - Tree[MinN].Key)
+				else
+					Writeln(0);
+			end;
 
 		end;
-		Readln;
 	end;
-
-	t.Free;
 end.
