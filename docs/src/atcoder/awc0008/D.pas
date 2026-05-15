@@ -1,5 +1,6 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #heap
 uses
 	Generics.Collections;
 const
