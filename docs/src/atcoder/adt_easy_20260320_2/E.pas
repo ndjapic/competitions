@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}
+// #heap #sort
 uses
 	Generics.Collections;
 const
