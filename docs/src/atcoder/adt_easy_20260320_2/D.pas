@@ -1,5 +1,6 @@
 program _D;
 {$MODE DELPHI}
+// #heap
 uses
 	Generics.Collections;
 type
