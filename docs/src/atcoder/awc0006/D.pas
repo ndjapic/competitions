@@ -1,5 +1,6 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #list #sort #heap
 uses
 	Generics.Defaults, Generics.Collections, Math;
 type
