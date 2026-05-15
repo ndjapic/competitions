@@ -1,5 +1,6 @@
 program D_Long_Waiting;
 {$MODE DELPHI}
+// #heap
 uses
 	Generics.Collections, math;
 const
