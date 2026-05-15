@@ -1,5 +1,6 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #heap #dijkstra #grid
 uses
 	generics.collections;
 const
