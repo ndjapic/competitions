@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #heap #dijkstra #sort
 uses
 	Generics.Defaults, Generics.Collections, Math;
 const
