@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #dp #mask #pathfinder #traveling_salesman
 uses
 	math;
 const
