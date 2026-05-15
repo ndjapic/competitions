@@ -1,5 +1,6 @@
 program _A;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #hashset
 uses
 	Generics.Defaults;
 type
