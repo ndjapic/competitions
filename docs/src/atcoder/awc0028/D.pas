@@ -1,5 +1,6 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #heap #toposort
 uses
 	Generics.Collections;
 const
