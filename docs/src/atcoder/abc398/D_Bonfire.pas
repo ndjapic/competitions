@@ -1,5 +1,6 @@
 program D_Bonfire;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #hashset
 uses
 	Generics.Defaults;
 type
