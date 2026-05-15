@@ -1,5 +1,6 @@
 program E_Cut_in_Half;
 {$MODE DELPHI}
+// #heap
 uses
 	Generics.Collections;
 type
