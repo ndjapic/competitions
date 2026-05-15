@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #mask #seen #dfs #permutation
 uses
 	math;
 const
