@@ -1,5 +1,6 @@
 program B_Get_Min;
 {$MODE DELPHI}
+// #heap
 uses
 	Generics.Collections;
 
