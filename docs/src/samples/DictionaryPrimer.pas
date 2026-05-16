@@ -1,3 +1,67 @@
+program SafeDictionaryDemo;
+
+{$mode delphi} // Важно за Generics.Collections
+
+uses
+	Generics.Collections, SysUtils;
+
+var
+	Dict: TDictionary<Int32, Boolean>;
+	Key: Int32;
+	Value: Boolean;
+
+begin
+	Dict := TDictionary<Int32, Boolean>.Create;
+	try
+		// Попуњавање помоћу безбедне AddOrSetValue методе
+		Dict.AddOrSetValue(1, True);
+		Dict.AddOrSetValue(2, False);
+		Dict.AddOrSetValue(3, True);
+		Dict.AddOrSetValue(4, False);
+
+		// БЕЗБЕДНО ЧИТАЊЕ (без KeyNotFoundException)
+		// Тражимо кључ који не постоји
+		if Dict.TryGetValue(99, Value) then
+			Writeln('Кључ 99 постоји и вредност је: ', Value)
+		else
+			Writeln('Кључ 99 не постоји. (Безбедно пропуштено)');
+
+		// БЕЗБЕДНО БРИСАЊЕ ТОКОМ ИТЕРАЦИЈЕ (без рушења петље)
+		// Услов: Бришемо све кључеве који имају вредност 'False'
+		for Key in Dict.Keys.ToArray do
+		begin
+			// Знамо да кључ постоји јер је извучен из ToArray, али TryGetValue је добра пракса
+			if Dict.TryGetValue(Key, Value) then
+			begin
+				if not Value then // Ако је вредност False
+				begin
+					// Remove враћа Boolean, не баца изузетак чак и ако је кључ већ обрисан
+					if Dict.Remove(Key) then
+						Writeln('Успешно обрисан кључ: ', Key);
+				end;
+			end;
+		end;
+
+		// ПРИКАЗ ПРЕОСТАЛИХ ЕЛЕМЕНАТА
+		Writeln('--- Преостали елементи у речнику ---');
+		for Key in Dict.Keys do begin
+			Dict.TryGetValue(Key, Value);
+			Writeln('Кључ: ', Key, ', Вредност: ', Value);
+		end;
+
+		for Key in Dict.Keys.ToArray do begin
+			// Безбедно спајање у једну линију: прво бришемо, али САМО ако је вредност у речнику False
+			if (not Dict[Key]) and Dict.Remove(Key) then
+				Writeln('Успешно обрисан кључ: ', Key);
+		end;
+
+	finally
+		Dict.Free;
+	end;
+	Readln;
+end.
+
+
 program DictionaryPrimer;
 
 {$APPTYPE CONSOLE}
