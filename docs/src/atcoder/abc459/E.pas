@@ -8,7 +8,7 @@ const
 var
 	n, i, num, den, ans: int32;
 	p: array [2 .. NN] of int32;
-	c, d: array [2 .. NN] of int32;
+	c, d: array [1 .. NN] of int32;
 	adj: array [1 .. NN] of tlist<int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
