@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #dfs #graph #distance #seen
 uses
 	math;
 const
