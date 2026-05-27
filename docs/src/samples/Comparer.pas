@@ -37,6 +37,7 @@ var
 begin
 	SetTextBuf(Input, InputBuf);
 	SetTextBuf(Output, OutputBuf);
+	Randomize;
 
 	readln(n);
 
