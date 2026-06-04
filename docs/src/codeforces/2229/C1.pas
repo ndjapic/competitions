@@ -1,4 +1,4 @@
-program _C;
+program _C1;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 const
 	NN = 200 * 1000;
