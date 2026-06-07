@@ -49,6 +49,7 @@ begin
 	for i := 1 to n do begin
 		ReadLn(b.h, b.w);
 		blocks.Add(b);
+		blocks.Exchange(i-1, Random(i));
 	end;
 
 	blocks.Sort(TComparer<TBlock>.Construct(CompareBlocks));
