@@ -110,8 +110,9 @@ begin
 			a := pq.Pop;
 			b := pq.Pop;
 		end;
-	finally
+
 		writeln(ans);
+	finally
 		pq.Free;
 	end;
 end.
