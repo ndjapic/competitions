@@ -1,85 +1,32 @@
-program C_Lock_All_Doors;
-uses
-	math;
+program _E;
+{$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 const
-	nn = 200 * 1000 + 1;
+	NN = 200 * 1000;
 var
-	n, i, j, r, ans1, ans2: int32;
-	l, l1, l2: array [0 .. nn] of int8;
+	n, t, i, l, r, ans: int32;
+	a: array [1 .. NN] of int8;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
-	readln(n, r);
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
 
-	for i := 0 to n+1 do begin
-		if (1 <= i) and (i <= n) then
-			read(l[i])
-		else
-			l[i] := 1;
-		l1[i] := l[i];
-		l2[i] := l[i];
-	end;
+	readln(n, t);
+
+	for i := 1 to n do read(a[i]);
 	readln;
 
-	i := 0;
-	j := n;
-	while (i < r) and (l[i+1] = 1) do inc(i);
-	while (j > r) and (l[j] = 1) do dec(j);
+	l := 0;
+	r := n;
+	while (l < t) and (a[l+1] = 1) do inc(l);
+	while (r > t) and (a[r] = 1) do dec(r);
 
-	ans1 := 0;
-	ans2 := 0;
-
-
-	while r > i+1 do begin
-		if l1[r] = 1 then begin
-			l1[r] := 0;
-			inc(ans1);
-		end;
-		dec(r);
+	ans := r-l;
+	i := r;
+	while i > l do begin
+		if a[i] = 1 then inc(ans);
+		dec(i);
 	end;
 
-	if (r = i+1) and (l1[r] = 0) then begin
-		l1[r] := 1;
-		inc(ans1);
-	end;
-
-	while r < j do begin
-		if l1[r+1] = 1 then begin
-			l1[r+1] := 0;
-			inc(ans1);
-		end;
-		inc(r);
-		if l1[r] = 0 then begin
-			l1[r] := 1;
-			inc(ans1);
-		end;
-	end;
-
-
-	while r < j-1 do begin
-		if l2[r+1] = 1 then begin
-			l2[r+1] := 0;
-			inc(ans2);
-		end;
-		inc(r);
-	end;
-
-	if (r = j-1) and (l2[r+1] = 0) then begin
-		l2[r+1] := 1;
-		inc(ans2);
-	end;
-
-	while r > i do begin
-		if l2[r] = 1 then begin
-			l2[r] := 0;
-			inc(ans2);
-		end;
-		dec(r);
-		if l2[r+1] = 0 then begin
-			l2[r+1] := 1;
-			inc(ans2);
-		end;
-	end;
-
-
-	writeln(min(ans1, ans2));
+	writeln(ans);
 end.
