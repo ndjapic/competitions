@@ -5,49 +5,12 @@ uses
 	math, Generics.Collections;
 const
 	NN = 100 * 1000;
-type
-	TQueue<T> = class
-	private
-		FData: array of T;
-		FHead: Int32;
-		FTail: Int32;
-	public
-		constructor Create(ACapacity: Int32);
-		procedure PushBack(const Item: T);
-		function PopFront: T;
-		function Count: Int32;
-	end;
-
 var
 	n, m, i, j, k, u, v, l, r, e: int32;
 	h, dist: array [1 .. NN] of int32;
 	adj: array [1 .. NN] of tlist<int32>;
 	q: TQueue<int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
-
-constructor TQueue<T>.Create(ACapacity: Int32);
-begin
-	SetLength(FData, ACapacity);
-	FHead := 0;
-	FTail := -1;
-end;
-
-procedure TQueue<T>.PushBack(const Item: T);
-begin
-	Inc(FTail);
-	FData[FTail] := Item;
-end;
-
-function TQueue<T>.PopFront: T;
-begin
-	Result := FData[FHead];
-	Inc(FHead);
-end;
-
-function TQueue<T>.Count: Int32;
-begin
-	Result := FTail - FHead + 1;
-end;
 
 begin
 	SetTextBuf(Input, InputBuf);
@@ -77,15 +40,15 @@ begin
 		dist[1] := 1;
 
 		if h[1] <= e then begin
-			q := TQueue<int32>.Create(n);
-			q.PushBack(1);
+			q := TQueue<int32>.Create;
+			q.Enqueue(1);
 
 			while q.Count > 0 do begin
-				u := q.PopFront;
+				u := q.Dequeue;
 				for v in adj[u] do
 					if (h[v] <= e) and (dist[v] > dist[u] + 1) then begin
 						dist[v] := dist[u] + 1;
-						q.PushBack(v);
+						q.Enqueue(v);
 					end;
 			end;
 
