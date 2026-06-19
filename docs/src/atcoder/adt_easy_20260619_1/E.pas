@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #palindrome #shift
 uses
 	math;
 var
