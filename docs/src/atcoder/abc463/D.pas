@@ -1,21 +1,25 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
 // #heap #bisect
+uses
+	Generics.Collections, Generics.Defaults, {SysUtils,} Math;
 const
 	NN = 200 * 1000;
 type
 	TPrioQueue<T> = class
+	private
+		FComparer: IComparer<T>;
 	public
 		items: array [0 .. NN] of T;
 		count: int32;
-		constructor Create;
-		function Compare(lhs, rhs: T): int32;
+		constructor Create(AComparer: IComparer<T>);
+		{destructor Destroy; override;}
 		procedure setItem(v: int32; x: T);
 		procedure swim(v: int32; x: T);
 		procedure push(x: T);
 		function prioChild(u: int32): int32;
 		procedure sink(u: int32; x: T);
-		procedure pop;
+		function pop: T;
 	end;
 var
 	n, k, i, bl, br, bm, x, noc: int32;
@@ -23,15 +27,22 @@ var
 	pq: TPrioQueue<Int32>;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-constructor TPrioQueue<T>.Create;
+function HeapCompare(constref lhs, rhs: Int32): int32;
 begin
-	count := 0;
+	Result := CompareValue(r[lhs], r[rhs]);
 end;
 
-function TPrioQueue<T>.Compare(lhs, rhs: T): int32;
+constructor TPrioQueue<T>.Create(AComparer: IComparer<T>);
 begin
-	result := r[lhs] - r[rhs];
+	count := 0;
+	FComparer := AComparer;
 end;
+
+{destructor THeap<T>.Destroy;
+begin
+	FList.Free;
+	inherited;
+end;}
 
 procedure TPrioQueue<T>.setItem(v: int32; x: T);
 begin
@@ -43,7 +54,7 @@ var
 	u: int32;
 begin
 	u := (v-1) div 2;
-	while (v > 0) and (Compare(x, items[u]) < 0) do begin
+	while (v > 0) and (FComparer.Compare(x, items[u]) < 0) do begin
 		setItem(v, items[u]);
 		v := u;
 		u := (v-1) div 2;
@@ -62,7 +73,7 @@ var
 	v: int32;
 begin
 	v := u * 2 + 1;
-	if (v+1 < count) and (Compare(items[v+1], items[v]) < 0) then inc(v);
+	if (v+1 < count) and (FComparer.Compare(items[v+1], items[v]) < 0) then inc(v);
 	result := v;
 end;
 
@@ -71,7 +82,7 @@ var
 	v: int32;
 begin
 	v := prioChild(u);
-	while (v < count) and (Compare(items[v], x) < 0) do begin
+	while (v < count) and (FComparer.Compare(items[v], x) < 0) do begin
 		setItem(u, items[v]);
 		u := v;
 		v := prioChild(u);
@@ -79,8 +90,9 @@ begin
 	setItem(u, x);
 end;
 
-procedure TPrioQueue<T>.pop;
+function TPrioQueue<T>.pop: T;
 begin
+	result := items[0];
 	dec(count);
 	if count > 0 then sink(0, items[count]);
 end;
@@ -96,7 +108,7 @@ begin
 	br := 1 shl 30;
 	while br - bl > 1 do begin
 		bm := (bl + br) div 2;
-		pq := TPrioQueue<Int32>.Create;
+		pq := TPrioQueue<Int32>.Create(TComparer<Int32>.Construct(HeapCompare));
 		try
 
 			for i := 1 to n do pq.push(i);
@@ -105,15 +117,12 @@ begin
 			x := 0;
 			while (pq.count > 0) and (noc < k) do begin
 
-				while (pq.count > 0) and (l[pq.items[0]] < x) do pq.pop;
+				i := pq.pop;
+				while (pq.count > 0) and (l[i] < x) do i := pq.pop;
 
-				if pq.count > 0 then begin
-					i := pq.items[0];
-
-					if l[i] >= x then begin
-						inc(noc);
-						x := r[i] + bm;
-					end;
+				if l[i] >= x then begin
+					inc(noc);
+					x := r[i] + bm;
 				end;
 
 			end;
