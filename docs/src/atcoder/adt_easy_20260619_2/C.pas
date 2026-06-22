@@ -30,7 +30,7 @@ begin
 	while (i < r) and col[i] do inc(i);
 
 	if (i < r) and (s[1] = '0') then
-		write('Yes')
+		writeln('Yes')
 	else
-		write('No');
+		writeln('No');
 end.
