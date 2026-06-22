@@ -11,7 +11,7 @@ begin
 	readln(n, x, y, z);
 
 	if ((x <= z) and (z <= y)) or ((x >= z) and (z >= y)) then
-		write('Yes')
+		writeln('Yes')
 	else
-		write('No');
+		writeln('No');
 end.
