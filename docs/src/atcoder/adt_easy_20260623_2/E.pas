@@ -1,11 +1,11 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-// #bisect
+// #min
 uses
 	math;
 var
-	ntc, tci, na, nb, nc: int32;
-	l, r, m: int64;
+	ntc, tci: int32;
+	na, nb, nc, ans: int64;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
@@ -16,16 +16,8 @@ begin
 	for tci := 1 to ntc do begin
 		readln(na, nb, nc);
 
-		l := 0;
-		r := min(na, nc) + 1;
-		while r-l > 1 do begin
-			m := (l+r) div 2;
-			if (m <= na) and (m <= nc) and (m <= na-m + nb + nc-m) then
-				l := m
-			else
-				r := m;
-		end;
+		ans := min(min(na, nc), (na + nb + nc) div 3);
 
-		writeln(l);
+		writeln(ans);
 	end;
 end.
