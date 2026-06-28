@@ -1,5 +1,6 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #counter #keys #sort
 uses
 	Generics.Collections,
 	Generics.Defaults, Math;
