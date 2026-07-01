@@ -1,6 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-// #pewfix #sufix #sum
+// #prefix #sufix #sum
 uses
 	math;
 const
