@@ -17,7 +17,6 @@ begin
 	readln(q);
 
 	s := tstack<int8>.create;
-	for i := 1 to NN do s.push(0);
 
 	for i := 1 to q do begin
 		read(tp);
@@ -28,9 +27,14 @@ begin
 				s.push(x);
 			end;
 
-			2: writeln(s.pop);
+			2: if s.count > 0 then
+				writeln(s.pop)
+			else
+				writeln(0);
 
 		end;
 		readln;
 	end;
+
+	s.free;
 end.
