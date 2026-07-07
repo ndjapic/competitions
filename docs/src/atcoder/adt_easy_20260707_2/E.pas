@@ -14,11 +14,7 @@ var
 begin
 	if not dp.trygetvalue(n, result) then begin
 		h := n div 2;
-		if odd(n) then
-			result := dfs(h) + dfs(h+1)
-		else
-			result := 2 * dfs(h);
-		inc(result, n);
+		result := n + dfs(h) + dfs(n-h);
 		dp.addorsetvalue(n, result);
 	end;
 end;
