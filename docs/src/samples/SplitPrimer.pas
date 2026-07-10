@@ -1,10 +1,11 @@
 program SplitPrimer;
 {$MODE DELPHI}
-uses SysUtils;
-
+uses
+	SysUtils;
 var
 	Line: string;
 	Tokens: TStringArray; // Није потребно декларисати дужину, Split је сам одређује
+
 begin
 	if not SeekEof then
 	begin
