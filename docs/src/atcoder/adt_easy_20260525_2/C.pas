@@ -1,94 +1,50 @@
 program _C;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-// #heap
+// #min #segtree #walk #point #update
 uses
-	Generics.Collections, Generics.Defaults, SysUtils, Math;
+	Generics.Collections;
 const
 	NN = 100;
-type
-	THeap<T> = class
-	private
-		FList: TList<T>;
-		FComparer: IComparer<T>;
-		function GetFavoriteChild(ParentIdx: int32): int32;
-	public
-		constructor Create(AComparer: IComparer<T>);
-		destructor Destroy; override;
-		procedure Push(const Item: T);
-		function Pop: T;
-		function Count: int32;
-	end;
-	TBox = record
-		b, c: int8;
-	end;
+	TT = 256;
 var
-	n, q, i, b: int8;
-	box: TBox;
+	n, q, i, b, l, r: int8;
+	v: int32;
 	c: array [1 .. NN] of int8;
-	pq: THeap<TBox>;
+	st: array [1 .. TT] of int8;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
-function HeapCompare(constref l, r: TBox): int32;
+procedure combine(v: int32);
 begin
-	Result := CompareValue(l.c, r.c);
-	if Result = 0 then Result := CompareValue(l.b, r.b);
+	if c[st[2*v]] <= c[st[2*v+1]] then
+		st[v] := st[2*v]
+	else
+		st[v] := st[2*v+1];
 end;
 
-constructor THeap<T>.Create(AComparer: IComparer<T>);
-begin
-	FList := TList<T>.Create;
-	FComparer := AComparer;
-end;
-
-destructor THeap<T>.Destroy;
-begin
-	FList.Free;
-	inherited;
-end;
-
-function THeap<T>.Count: int32;
-begin
-	Result := FList.Count;
-end;
-
-function THeap<T>.GetFavoriteChild(ParentIdx: int32): int32;
+procedure build(v, l, r: int32);
 var
-	L, R: int32;
+	m: int32;
 begin
-	L := ParentIdx * 2 + 1;
-	R := L + 1;
-	Result := L;
-	if (R < FList.Count) and (FComparer.Compare(FList[R], FList[L]) < 0) then
-		Result := R;
-end;
-
-procedure THeap<T>.Push(const Item: T);
-var
-	Idx, ParentIdx: int32;
-begin
-	Idx := FList.Add(Item);
-	ParentIdx := (Idx - 1) div 2;
-	while (Idx > 0) and (FComparer.Compare(FList[Idx], FList[ParentIdx]) < 0) do begin
-		FList.Exchange(Idx, ParentIdx);
-		Idx := ParentIdx;
-		ParentIdx := (Idx - 1) div 2;
+	if l < r then begin
+		m := (l+r) div 2;
+		build(2*v, l, m);
+		build(2*v+1, m+1, r);
 	end;
+	st[v] := l;
 end;
 
-function THeap<T>.Pop: T;
+procedure update(v, vl, vr, b: int32);
 var
-	Idx, ChildIdx: int32;
+	m: int32;
 begin
-	Result := FList[0];
-	FList[0] := FList[FList.Count - 1];
-	FList.Delete(FList.Count - 1);
-	
-	Idx := 0;
-	ChildIdx := GetFavoriteChild(Idx);
-	while (ChildIdx < FList.Count) and (FComparer.Compare(FList[ChildIdx], FList[Idx]) < 0) do begin
-		FList.Exchange(Idx, ChildIdx);
-		Idx := ChildIdx;
-		ChildIdx := GetFavoriteChild(Idx);
+	if (b < vl) or (vr < b) then
+	else if (b <= vl) and (vr <= b) then
+		st[v] := b
+	else {if vl < vr then} begin
+		m := (vl+vr) div 2;
+		update(2*v, vl, m, b);
+		update(2*v+1, m+1, vr, b);
+		combine(v);
 	end;
 end;
 
@@ -97,34 +53,34 @@ begin
 	SetTextBuf(Output, OutputBuf);
 
 	readln(n, q);
-
-	pq := THeap<TBox>.Create(TComparer<TBox>.Construct(HeapCompare));
-	box.c := 0;
-	for b := 1 to n do begin
-		c[b] := 0;
-		box.b := b;
-		pq.Push(box);
-	end;
+	for b := 1 to n do c[b] := 0;
+	build(1, 1, n);
 
 	for i := 1 to q do begin
 		read(b);
-		box.b := b;
 
 		if b = 0 then begin
-			repeat
-				box := pq.Pop;
-				b := box.b;
-			until c[b] = box.c;
+			v := 1;
+			l := 1;
+			r := n;
+			while l < r do begin
+				b := (l+r) div 2;
+				if c[st[2*v]] <= c[st[2*v+1]] then begin
+					r := b;
+					v := 2*v;
+				end else begin
+					l := b+1;
+					v := 2*v+1;
+				end;
+			end;
+			b := l;
 		end;
 
 		inc(c[b]);
-		box.c := c[b];
-		pq.Push(box);
+		update(1, 1, n, b);
 		write(b);
 		if i < q then write(' ');
 	end;
 	readln;
 	writeln;
-
-	pq.Free;
 end.
