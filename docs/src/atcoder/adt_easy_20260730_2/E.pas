@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #bisect
 const
 	NN = 300 * 1000;
 var
