@@ -1,14 +1,10 @@
 program _D;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
-// #WA
-const
-	NN = 100;
 var
-	n, i, j: int8;
+	n, i: int8;
 	ch: char;
 	s: string;
-	last: array ['a' .. 'z'] of int8;
-	c: array [0 .. NN] of int8;
+	c: array ['a' .. 'z'] of int8;
 	InputBuf, OutputBuf: array [1 .. 65536] of Char;
 
 begin
@@ -18,20 +14,16 @@ begin
 	readln(s);
 	n := length(s);
 
-	for ch := 'a' to 'z' do last[ch] := 0;
+	i := n div 2;
+	while (i > 0) and (s[2*i-1] = s[2*i]) do dec(i);
 
-	c[0] := 0;
-	for i := 1 to n do begin
-		ch := s[i];
-		j := last[ch];
-		c[i] := c[j] + 1;
-		last[ch] := i;
-	end;
+	for ch := 'a' to 'z' do c[ch] := 0;
+	for ch in s do inc(c[ch]);
 
 	ch := 'a';
-	while (ch <= 'z') and ((last[ch] = 0) or (c[last[ch]] = 2)) do inc(ch);
+	while (ch <= 'z') and ((c[ch] = 0) or (c[ch] = 2)) do inc(ch);
 
-	if ch > 'z' then
+	if not odd(n) and (i <= 0) and (ch > 'z') then
 		writeln('Yes')
 	else
 		writeln('No');
