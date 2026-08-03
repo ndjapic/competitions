@@ -19,9 +19,15 @@ begin
 	for i := 1 to n do begin
 		for j := 1 to m do begin
 			read(b[i, j]);
-			if ans and (i > 1) then ans := b[i, j] - b[i-1, j] = MM;
-			if ans and (j > 1) then ans := b[i, j] - b[i, j-1] = 1;
-			if ans and (j = m) then ans := (b[i, m] - 1) div 7 = (b[i, 1] - 1) div 7;
+			if ans then begin
+				if j > 1 then
+					ans := b[i, j] - b[i, j-1] = 1
+				else if i > 1 then
+					ans := b[i, j] - b[i-1, j] = MM;
+
+				if ans and (j = m) then
+					ans := (b[i, m] - 1) div 7 = (b[i, 1] - 1) div 7;
+			end;
 		end;
 		readln;
 	end;
