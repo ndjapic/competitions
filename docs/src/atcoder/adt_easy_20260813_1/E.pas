@@ -1,5 +1,6 @@
 program _E;
 {$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+// #grid #counterclockwise #rotation
 uses
 	math;
 const
@@ -30,7 +31,7 @@ begin
 				x0 := x1;
 				y0 := y1;
 			end;
-			s[j] := a[x0, y0];
+			s[j] := a[x0][y0];
 		end;
 		writeln(s);
 	end;
