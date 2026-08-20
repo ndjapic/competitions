@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="55"/>
+        <CursorPos Y="86"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="11">
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Column="18"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="22" TopLine="6"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="38" TopLine="22"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="39" TopLine="23"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="46" Column="46" TopLine="30"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="53" Column="19" TopLine="37"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="55" TopLine="39"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="9" Column="15"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="96" Column="53" TopLine="68"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="74" Column="52" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="42" Column="20" TopLine="26"/>
+      </Position>
+      <Position>
+        <Filename Value="E_Iva_Pav.pas"/>
+        <Caret Line="84" TopLine="53"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

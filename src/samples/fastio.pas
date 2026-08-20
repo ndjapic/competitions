@@ -1,0 +1,95 @@
+program fastio;
+{$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+uses
+	Generics.Defaults, Generics.Collections, SysUtils, Classes, Math;
+const
+	nn = 200 * 1000;
+type
+	TIntComparer = class(TComparer<int32>)
+		function Compare(constref L, R: int32): Integer; override;
+	end;
+var
+	notc, tci: int32;
+	n, i: int32;
+	enu : TList<int32>.TEnumerator;
+	a: TList<int32>;
+	sl: TStringList;
+	ios, se: string;
+	Comparer: TIntComparer;
+	ans: array [0 .. nn] of int32;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
+
+function TIntComparer.Compare(constref L, R: int32): Integer;
+begin
+	Result := L - R;
+end;
+
+function FastReadInt: Int64;
+var
+	ch: Char;
+begin
+	Result := 0;
+	repeat
+		read(ch);
+	until ch in ['0'..'9', '-']; // прескочи размаке и крај реда
+
+	while ch in ['0'..'9'] do begin
+		Result := Result * 10 + (ord(ch) - ord('0'));
+		if eof then break;
+		read(ch);
+	end;
+end;
+
+begin
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
+	randomize;
+	sl := TStringList.Create;
+	sl.Delimiter := ' ';
+	a := TList<int32>.Create;
+	Comparer := TIntComparer.Create;
+	Comparer._AddRef;
+
+	readln(notc);
+	for tci := 1 to notc do begin
+
+		readln(n); // Note: Local variable "n" is assigned but never used
+		readln(ios);
+		sl.DelimitedText := ios;
+
+		a.Clear;
+		for se in sl do begin
+			a.Add(StrToInt(se));
+			a.Exchange(a.Count - 1, random(a.Count));
+		end;
+		a.Sort(Comparer);
+
+		sl.Clear;
+		enu := a.GetEnumerator;
+		for i := 0 to a.Count -1 do
+			if enu.MoveNext then begin
+				ans[i] := sqr(enu.GetCurrent);
+				sl.Add(IntToStr(ans[i]));
+			end;
+
+		writeln(sl.DelimitedText);
+		{flush(StdErr); flush(output);} // DO NOT REMOVE
+
+	end;
+
+	FreeAndNil(sl);
+	FreeAndNil(a);
+	Comparer._Release;
+	{Comparer.Free;}
+end.
+(*
+1
+5
+2  5  3  4  1  
+1 4 9 16 25
+
+
+------------------
+(program exited with code: 0)
+Press return to continue
+*)

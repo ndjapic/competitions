@@ -1,0 +1,6 @@
+n = int(input())
+a = list(map(int, input().split()))
+tacno = sum(a)
+priblizno = sum((x+50)//100*100 for x in a)
+print(tacno)
+print(priblizno)

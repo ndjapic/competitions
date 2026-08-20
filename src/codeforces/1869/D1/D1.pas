@@ -1,0 +1,117 @@
+program D1_Candy_Party_Easy_Version;
+uses
+    math;
+const
+    maxn = 200 * 1000;
+var
+    ntc, tci: int16;
+    n, i, x: int32;
+    s: int64;
+    is_zero, ans: boolean;
+    a, cp: array [1 .. maxn] of int32;
+
+procedure msort(l, r: int32);
+var
+    m, i, il, ir: int32;
+begin
+    if l < r then begin
+
+        m := (l+r) div 2;
+        msort(l, m);
+        msort(m+1, r);
+
+        il := l;
+        ir := m+1;
+        for i := l to r do
+            if (ir > r) or (il <= m) and (a[il] <= a[ir]) then begin
+                cp[i] := a[il];
+                inc(il);
+            end else begin
+                cp[i] := a[ir];
+                inc(ir);
+            end;
+
+        for i := l to r do a[i] := cp[i];
+
+    end;
+end;
+
+function is_ok1(d: int32): boolean;
+begin
+    while not odd(d) do d := d div 2;
+    if d = 1 then
+        is_ok1 := true
+    else begin
+        inc(d);
+        while not odd(d) do d := d div 2;
+        is_ok1 := d = 1;
+    end;
+end;
+
+function is_ok2(d: int32): boolean;
+begin
+    while not odd(d) do d := d div 2;
+    if d = 1 then
+        is_ok2 := false
+    else begin
+        inc(d);
+        while not odd(d) do d := d div 2;
+        is_ok2 := d = 1;
+    end;
+end;
+
+begin
+    readln(ntc);
+    for tci := 1 to ntc do begin
+
+        readln(n);
+
+        s := 0;
+        for i := 1 to n do begin
+            read(a[i]);
+            inc(s, a[i]);
+        end;
+        readln;
+
+        ans := s mod n = 0;
+        if ans then begin
+
+            s := s div n;
+
+            is_zero := false;
+            x := 0;
+            for i := 1 to n do begin
+                is_zero := is_zero or (a[i] = s);
+                x := x xor abs(a[i] - s);
+            end;
+
+            if is_zero then begin
+
+                for i := 1 to n do
+                    if ans then
+                        ans := (a[i] = s) or is_ok1(abs(a[i] - s));
+
+            end else begin
+
+                for i := 1 to n do
+                    if ans then
+                        ans := (a[i] = s) or is_ok2(abs(a[i] - s));
+
+            end;
+
+            ans := ans and (x = 0);
+
+            msort(1, n);
+            for i := 1 to n do
+                ans := ans and (a[i] + a[n+1-i] = 2*s);
+
+        end;
+
+        if ans then
+            writeln('Yes')
+        else
+            writeln('No');
+
+    end;
+end.
+

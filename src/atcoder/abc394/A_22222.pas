@@ -1,0 +1,14 @@
+program A_22222;
+{$MODE DELPHI}
+var
+    i: int8;
+    s: string;
+
+begin
+    readln(s);
+
+    for i := 1 to length(s) do
+        if s[i] = '2' then write('2');
+
+    writeln;
+end.

@@ -1,0 +1,24 @@
+program _D;
+{$MODE DELPHI}{$OPTIMIZATION LEVEL3,ON}
+const
+	nn = 200 * 1000;
+var
+	n, i, s, t: int32;
+	a: array [1 .. nn] of int64;
+	InputBuf, OutputBuf: array [1 .. 65536] of Char;
+
+begin
+	SetTextBuf(Input, InputBuf);
+	SetTextBuf(Output, OutputBuf);
+
+	readln(n);
+	for i := 1 to n do read(a[i]);
+	readln;
+
+	for i := 1 to n-1 do begin
+		readln(s, t);
+		inc(a[i+1], a[i] div s * t);
+	end;
+
+	writeln(a[n]);
+end.

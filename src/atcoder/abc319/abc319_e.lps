@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="abc319_e.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="abc319_e_Bus_Stops"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="6"/>
+        <CursorPos Y="37"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="2">
+      <Position>
+        <Filename Value="abc319_e.pas"/>
+        <Caret Line="5" Column="2"/>
+      </Position>
+      <Position>
+        <Filename Value="abc319_e.pas"/>
+        <Caret Line="37" TopLine="6"/>
+      </Position>
+      <Position>
+        <Filename Value="abc319_e.pas"/>
+        <Caret Line="33" Column="73" TopLine="6"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
